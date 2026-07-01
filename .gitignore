@@ -1,0 +1,19 @@
+# Build artifacts
+/bin/
+target/
+oracle/oracle
+
+# Local scratch scorecards (committed model scorecards live in scorecards/)
+/scorecard*.json
+
+# Model-run working dirs and raw transcripts (only scorecards/ is committed)
+/runs/
+/transcripts/
+/.codex-eval/
+/FAILURES.md
+
+# Misc
+*.wasm
+__pycache__/
+*.pyc
+.DS_Store

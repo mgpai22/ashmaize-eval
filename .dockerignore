@@ -1,0 +1,10 @@
+# Keep build artifacts and the local symlink out of the build context.
+**/target/
+oracle/oracle
+bin/
+runs/
+transcripts/
+.codex-eval/
+.git/
+scorecard*.json
+scorecards/
