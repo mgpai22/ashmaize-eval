@@ -1,0 +1,110 @@
+default: codex
+harnesses:
+  codex:
+    driver: codex
+    images:
+      agent:
+        name: ashmaize-eval-agent
+        target: agent
+      grader:
+        name: ashmaize-eval-grader
+        target: grader
+    prompt: harness/prompts/ashmaize_codex.txt
+    auth_home: .codex-eval/codex-home
+    model: gpt-5.4-mini
+    attempt_timeout: 4h
+    grader_timeout: 120s
+    workspace:
+      files:
+        - source: spec/TASK.md
+          target: /workspace/spec/TASK.md
+        - source: spec/ABI.md
+          target: /workspace/spec/ABI.md
+        - source: spec/ASHMAIZE.md
+          target: /workspace/spec/ASHMAIZE.md
+        - source: harness/prompts/workspace_agents.md
+          target: /workspace/AGENTS.md
+    docker:
+      flags:
+        - --cap-add=SYS_ADMIN
+        - --cap-add=SYS_CHROOT
+        - --cap-add=SETUID
+        - --cap-add=SETGID
+        - --cap-add=SYS_PTRACE
+        - --cap-add=NET_ADMIN
+        - --cap-add=NET_RAW
+        - --security-opt=seccomp=unconfined
+        - --security-opt=apparmor=unconfined
+    cli:
+      sandbox_mode: workspace-write
+      approval_policy: never
+      web_search: disabled
+      reasoning_effort: xhigh
+      allow_login_shell: false
+      workspace_write:
+        network_access: false
+      exec_flags:
+        - --strict-config
+        - --json
+        - --ephemeral
+        - --skip-git-repo-check
+  glm:
+    driver: codex
+    images:
+      agent:
+        name: ashmaize-eval-agent
+        target: agent
+      grader:
+        name: ashmaize-eval-grader
+        target: grader
+    prompt: harness/prompts/ashmaize_codex.txt
+    auth_home: .codex-eval/codex-home
+    model: glm-5.2
+    attempt_timeout: 4h
+    grader_timeout: 120s
+    workspace:
+      files:
+        - source: spec/TASK.md
+          target: /workspace/spec/TASK.md
+        - source: spec/ABI.md
+          target: /workspace/spec/ABI.md
+        - source: spec/ASHMAIZE.md
+          target: /workspace/spec/ASHMAIZE.md
+        - source: harness/prompts/workspace_agents.md
+          target: /workspace/AGENTS.md
+    docker:
+      flags:
+        - --cap-add=SYS_ADMIN
+        - --cap-add=SYS_CHROOT
+        - --cap-add=SETUID
+        - --cap-add=SETGID
+        - --cap-add=SYS_PTRACE
+        - --cap-add=NET_ADMIN
+        - --cap-add=NET_RAW
+        - --security-opt=seccomp=unconfined
+        - --security-opt=apparmor=unconfined
+    cli:
+      sandbox_mode: workspace-write
+      approval_policy: never
+      web_search: disabled
+      reasoning_effort: max
+      allow_login_shell: false
+      workspace_write:
+        network_access: false
+      exec_flags:
+        - --strict-config
+        - --json
+        - --ephemeral
+        - --skip-git-repo-check
+    provider:
+      id: zai_proxy
+      name: Z.AI GLM Coding Plan (via bridge)
+      wire_api: responses
+      api_key_env: OPENAI_API_KEY
+      key_env: ZAI_API_KEY
+      stream_idle_timeout_ms: 3000000
+      bridge:
+        image: ashmaize-zai-bridge
+        dockerfile: container/zai-bridge.Dockerfile
+        port: 31415
+        upstream_base_url: https://api.z.ai/api/coding/paas/v4

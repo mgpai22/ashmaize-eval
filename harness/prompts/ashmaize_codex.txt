@@ -1,0 +1,22 @@
+You are in /workspace inside the AshMaize eval container.
+
+Available task files:
+- /workspace/spec/TASK.md
+- /workspace/spec/ABI.md
+- /workspace/spec/ASHMAIZE.md
+- /workspace/AGENTS.md
+
+There is no oracle during implementation. Final grading will compare your program against a hidden oracle after this session exits. Do not inspect /usr/local/bin/oracle, do not search for hidden scenarios, and do not assume any grader, oracle, scenario corpus, or upstream AshMaize source is available.
+
+No internet or dependency fetching is allowed from spawned commands. Use only installed toolchains and standard libraries already present in the container.
+
+Implement the ABI described in spec/ABI.md from the algorithm in spec/ASHMAIZE.md. You may use any language available in the container. All compiled binaries, source files, scripts, and runtime data needed by your solution must live under /workspace.
+
+Required final artifact:
+- Create an executable /workspace/agent.sh.
+- It must read exactly one JSON request on stdin.
+- It must write exactly one JSON object on stdout.
+- It must exit 0 on success.
+- For invalid input, it must print {"error":"<reason>"} and exit non-zero.
+
+Run self-checks you can derive from the spec. Do not stop at a superficial smoke test. Do not assume access to scenarios, grader, oracle, or upstream AshMaize source.
