@@ -1,0 +1,554 @@
+{
+  "generated_at": "2026-07-01T03:50:40Z",
+  "harness": {
+    "attempt_policy": "single",
+    "codex_events": "transcripts/codex-gpt-5-4-mini-xhigh/codex-events.jsonl",
+    "codex_final_message": "transcripts/codex-gpt-5-4-mini-xhigh/codex-final.md",
+    "codex_inside_container": true,
+    "codex_model": "gpt-5.4-mini",
+    "codex_surface": "codex exec",
+    "generation_image": "ashmaize-eval-agent",
+    "grader_log": "transcripts/codex-gpt-5-4-mini-xhigh/grader.log",
+    "grading_image": "ashmaize-eval-grader",
+    "harness_id": "codex",
+    "harness_type": "codex",
+    "image": "ashmaize-eval-agent",
+    "model_label": "gpt-5.4-mini",
+    "note": "INTERRUPTED: codex exec was killed at a 1h wall-clock cap while still in its first turn (endless brute-force trying to match the non-power-of-two reference vector); it never emitted a final message. Score is the mid-flight /workspace/agent.sh snapshot, frozen and graded manually. No turn.completed event, so token usage is unavailable.",
+    "oracle_available_during_generation": false,
+    "reasoning_effort": "xhigh",
+    "run_dir": "runs/codex-gpt-5-4-mini-xhigh",
+    "slug": "codex-gpt-5-4-mini-xhigh",
+    "transcript_dir": "transcripts/codex-gpt-5-4-mini-xhigh"
+  },
+  "metrics": {
+    "generation_seconds": null,
+    "grading_seconds": 2.42,
+    "item_count": 103,
+    "turns": 0
+  },
+  "overall": 0.8088235294117647,
+  "results": [
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0001-unknown-op",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0002-missing-preimage",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0003-malformed-json",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0004-nonhex",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0005-odd-hex",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0006-uppercase-hex",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0007-negative-rom-size",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0008-zero-rom-size",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0009-non-multiple-rom-size",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0010-oversized-rom-size",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0011-nb-loops-too-small",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0012-nb-instrs-too-small",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0013-div-zero-no-special1",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0014-rotate-shift-too-large",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0015-unsupported-instr",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0016-float-rom-size",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0017-string-rom-size",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0018-numeric-hex-field",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0019-string-shift",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "correctly rejected invalid input (exit 1)",
+      "id": "adversarial-0020-empty-unit-hex",
+      "pass": true,
+      "section": "adversarial",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-add-wrap",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-and",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-bitrev",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-div-zero",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-div",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-hash0",
+      "pass": true,
+      "section": "procedural",
+      "weight": 0.5
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-hash1",
+      "pass": true,
+      "section": "procedural",
+      "weight": 0.5
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-hash2",
+      "pass": true,
+      "section": "procedural",
+      "weight": 0.5
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-hash3",
+      "pass": true,
+      "section": "procedural",
+      "weight": 0.5
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-hash4",
+      "pass": true,
+      "section": "procedural",
+      "weight": 0.5
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-hash5",
+      "pass": true,
+      "section": "procedural",
+      "weight": 0.5
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-hash6",
+      "pass": true,
+      "section": "procedural",
+      "weight": 0.5
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-hash7",
+      "pass": true,
+      "section": "procedural",
+      "weight": 0.5
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-isqrt",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-mod-division-quirk",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-mod-zero",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-mul-low",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-mulh",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-neg",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-rotl-0",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-rotl-1",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-rotl-31",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-rotr-0",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-rotr-1",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-rotr-31",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: out_hex",
+      "id": "procedural-op-xor",
+      "pass": true,
+      "section": "procedural",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex",
+      "id": "procedural-rom-0001-zero-4k",
+      "pass": true,
+      "section": "procedural",
+      "weight": 2.5
+    },
+    {
+      "detail": "match: rom_digest_hex",
+      "id": "procedural-rom-0002-ref-64k",
+      "pass": true,
+      "section": "procedural",
+      "weight": 2.5
+    },
+    {
+      "detail": "match: rom_digest_hex",
+      "id": "procedural-rom-0003-dead-262k",
+      "pass": true,
+      "section": "procedural",
+      "weight": 2.5
+    },
+    {
+      "detail": "match: rom_digest_hex",
+      "id": "procedural-rom-0004-ref-vector-10m",
+      "pass": true,
+      "section": "procedural",
+      "weight": 2.5
+    },
+    {
+      "detail": "match: rom_digest_hex",
+      "id": "procedural-rom-0005-a1-64k",
+      "pass": true,
+      "section": "procedural",
+      "weight": 2.5
+    },
+    {
+      "detail": "match: rom_digest_hex",
+      "id": "procedural-rom-0006-ff-4k",
+      "pass": true,
+      "section": "procedural",
+      "weight": 2.5
+    },
+    {
+      "detail": "match: rom_digest_hex",
+      "id": "procedural-rom-0007-ascii-262k",
+      "pass": true,
+      "section": "procedural",
+      "weight": 2.5
+    },
+    {
+      "detail": "match: rom_digest_hex",
+      "id": "procedural-rom-0008-long-64k",
+      "pass": true,
+      "section": "procedural",
+      "weight": 2.5
+    },
+    {
+      "detail": "match: rom_digest_hex",
+      "id": "procedural-rom-0009-nonpow2-65chunks",
+      "pass": true,
+      "section": "procedural",
+      "weight": 2.5
+    },
+    {
+      "detail": "match: rom_digest_hex",
+      "id": "procedural-rom-0010-prime257",
+      "pass": true,
+      "section": "procedural",
+      "weight": 2.5
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0001-min-loop",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0002-hello-64k",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0003-alt-instr",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0004-zero-seed-262k",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0005-pattern-aa",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0006-pattern-55",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0007-single-byte-high",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0008-ascii",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0009-counter",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0010-prime-bytes",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0011-short-zero",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex",
+      "id": "replay-0012-reference-small",
+      "pass": true,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "mismatch on reg_digest_hex",
+      "id": "replay-0013-nonpow2-small",
+      "pass": false,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "mismatch on reg_digest_hex",
+      "id": "replay-0014-nonpow2-mid",
+      "pass": false,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "mismatch on reg_digest_hex",
+      "id": "replay-0015-nonpow2-prime257",
+      "pass": false,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "mismatch on reg_digest_hex",
+      "id": "replay-0016-nonpow2-just-above-64k",
+      "pass": false,
+      "section": "replay",
+      "weight": 1
+    },
+    {
+      "detail": "mismatch on reg_digest_hex",
+      "id": "replay-0017-reference-10m-full",
+      "pass": false,
+      "section": "replay",
+      "weight": 1
+    }
+  ],
+  "section_scores": {
+    "adversarial": 1,
+    "procedural": 1,
+    "replay": 0.7058823529411765
+  },
+  "section_weights": {
+    "adversarial": 0.1,
+    "procedural": 0.25,
+    "replay": 0.65
+  }
+}
