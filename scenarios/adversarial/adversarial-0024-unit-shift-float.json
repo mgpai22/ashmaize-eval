@@ -1,0 +1,7 @@
+{
+  "id": "adversarial-0024-unit-shift-float",
+  "section": "adversarial",
+  "weight": 1.0,
+  "raw_request": "{\"op\":\"unit\",\"instr\":\"RotL\",\"a_hex\":\"0123456789abcdef\",\"shift\":1.0}",
+  "expect_error": true
+}

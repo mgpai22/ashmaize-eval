@@ -1,0 +1,7 @@
+{
+  "id": "adversarial-0025-nb-instrs-overflow-u64",
+  "section": "adversarial",
+  "weight": 1.0,
+  "raw_request": "{\"op\":\"hash\",\"preimage_hex\":\"68656c6c6f\",\"rom_seed_hex\":\"313233\",\"rom_size\":4096,\"nb_loops\":2,\"nb_instrs\":18446744073709551616}",
+  "expect_error": true
+}

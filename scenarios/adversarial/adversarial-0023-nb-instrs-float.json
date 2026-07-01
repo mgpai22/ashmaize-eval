@@ -1,0 +1,7 @@
+{
+  "id": "adversarial-0023-nb-instrs-float",
+  "section": "adversarial",
+  "weight": 1.0,
+  "raw_request": "{\"op\":\"hash\",\"preimage_hex\":\"68656c6c6f\",\"rom_seed_hex\":\"313233\",\"rom_size\":65536,\"nb_loops\":8,\"nb_instrs\":256.0}",
+  "expect_error": true
+}
