@@ -1,0 +1,15 @@
+[package]
+name = "ashmaize"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/input-output-hk/ce-ashmaize"
+description = """Ashmaize is a Random VM. Just like RandomX, except its core algorithm is optimised
+for mobile and webrowser development."""
+
+# Vendored fork for the AshMaize Eval reference oracle.
+# Pinned to input-output-hk/ce-ashmaize @ 58d6a1fe3df2582e14d53b67292ce8a36d90e7e6.
+# See UPSTREAM.md for the (small, oracle-only) modifications applied here.
+
+[dependencies]
+cryptoxide = "~0.5.1"

@@ -1,0 +1,16 @@
+[package]
+name = "oracle"
+version = "0.1.0"
+edition = "2021"
+description = "AshMaize Eval reference oracle: JSON-over-stdio ABI over the vendored ashmaize crate."
+
+[[bin]]
+name = "oracle"
+path = "src/main.rs"
+
+[dependencies]
+ashmaize = { path = "vendor/ce-ashmaize" }
+serde_json = "1"
+
+[profile.release]
+opt-level = 3
