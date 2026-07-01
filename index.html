@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="en" class="">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AshMaize Eval — Scorecards</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['ui-sans-serif','system-ui','-apple-system','BlinkMacSystemFont','"Segoe UI"','Roboto','"Helvetica Neue"','Arial','sans-serif'],
+          mono: ['ui-monospace','"SFMono-Regular"','"JetBrains Mono"','"IBM Plex Mono"','Menlo','Monaco','Consolas','monospace'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  :root { color-scheme: light dark; }
+  html { scroll-behavior: smooth; }
+  body { font-feature-settings: "cv02","cv03","cv04","cv11"; -webkit-font-smoothing: antialiased; }
+  .tabnum { font-variant-numeric: tabular-nums; }
+  .mono { font-family: ui-monospace, "SFMono-Regular", "JetBrains Mono", "IBM Plex Mono", Menlo, Monaco, Consolas, monospace; }
+
+  /* heat cells */
+  .heatcell { display:inline-flex; align-items:center; justify-content:center; border-radius:6px; font-variant-numeric: tabular-nums; color:#fff; font-weight:600; line-height:1; white-space:nowrap; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); }
+  .heatcell-lg { padding:.34rem .55rem; min-width:3.4rem; font-size:.82rem; letter-spacing:-.01em; }
+  .heatcell-sm { padding:.16rem .34rem; min-width:2.3rem; font-size:.7rem; }
+  .heatcell-neutral { background: transparent !important; color: inherit !important; box-shadow: inset 0 0 0 1px rgba(120,120,120,.35); }
+
+  /* sortable headers */
+  th.th-sort { cursor:pointer; user-select:none; white-space:nowrap; }
+  th.th-sort:hover { background: rgba(120,113,108,.10); }
+  .dark th.th-sort:hover { background: rgba(231,229,228,.06); }
+  th.th-active { color:#0f172a; }
+  .dark th.th-active { color:#fafaf9; }
+  th .arrow { opacity:.7; margin-left:.25rem; font-size:.7rem; }
+
+  /* row hover + expanded */
+  tr.model-row { transition: background .08s ease; }
+  tr.model-row:hover { background: rgba(120,113,108,.07); }
+  .dark tr.model-row:hover { background: rgba(231,229,228,.04); }
+  tr.model-row.expanded { background: rgba(120,113,108,.10); }
+  .dark tr.model-row.expanded { background: rgba(231,229,228,.06); }
+
+  /* pass/fail */
+  .pf { display:inline-flex; align-items:center; justify-content:center; width:1.15rem; height:1.15rem; border-radius:.3rem; font-size:.62rem; font-weight:700; }
+  .pf-pass { background: rgba(22,163,74,.14); color:#15803d; box-shadow: inset 0 0 0 1px rgba(22,163,74,.25); }
+  .dark .pf-pass { background: rgba(34,197,94,.16); color:#4ade80; box-shadow: inset 0 0 0 1px rgba(34,197,94,.3); }
+  .pf-fail { background: rgba(220,38,38,.14); color:#b91c1c; box-shadow: inset 0 0 0 1px rgba(220,38,38,.25); }
+  .dark .pf-fail { background: rgba(248,113,113,.16); color:#f87171; box-shadow: inset 0 0 0 1px rgba(248,113,113,.3); }
+  .pf-na  { background: rgba(120,113,108,.12); color:#78716c; box-shadow: inset 0 0 0 1px rgba(120,113,108,.25); }
+
+  /* spinner */
+  .spinner { width:22px; height:22px; border-radius:50%; border:2.5px solid rgba(120,113,108,.25); border-top-color:#0f172a; animation: spin .8s linear infinite; }
+  .dark .spinner { border-top-color:#fafaf9; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* compare grid sticky */
+  .cmp-grid { display:grid; }
+  .cmp-cell { padding:.5rem .65rem; border-bottom:1px solid; border-right:1px solid; min-width:0; }
+  .cmp-row-label { position:sticky; left:0; z-index:2; font-weight:600; }
+  .cmp-h { position:sticky; top:0; z-index:3; }
+  .cmp-disagree { background: rgba(220,38,38,.05); }
+  .dark .cmp-disagree { background: rgba(248,113,113,.07); }
+  .cmp-disagree .cmp-row-label { box-shadow: inset 3px 0 0 #dc2626; }
+
+  /* scrollbars */
+  * { scrollbar-width: thin; }
+  ::-webkit-scrollbar { height:11px; width:11px; }
+  ::-webkit-scrollbar-thumb { background: rgba(120,113,108,.35); border-radius:6px; border:3px solid transparent; background-clip: content-box; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(120,113,108,.55); background-clip: content-box; }
+
+  /* dropzone overlay */
+  #dropzone { transition: opacity .12s ease; }
+  .dz-active { border-color:#0f172a !important; }
+  .dark .dz-active { border-color:#fafaf9 !important; }
+
+  /* details/summary */
+  summary { cursor:pointer; list-style:none; }
+  summary::-webkit-details-marker { display:none; }
+
+  /* fade-in expand */
+  .fade-in { animation: fadeIn .12s ease; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(-2px);} to {opacity:1; transform:none;} }
+
+  .chip { display:inline-flex; align-items:center; gap:.2rem; padding:.05rem .34rem; border-radius:.3rem; font-size:.62rem; font-weight:600; letter-spacing:.02em; text-transform:uppercase; }
+</style>
+</head>
+<body class="bg-stone-50 text-stone-800 dark:bg-stone-950 dark:text-stone-200 min-h-screen font-sans">
+
+<!-- ===== Sticky top bar ===== -->
+<header class="sticky top-0 z-30 h-14 flex items-center gap-3 px-4 sm:px-5 border-b border-stone-200 dark:border-stone-800 bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur">
+  <div class="flex items-center gap-2.5 min-w-0">
+    <div class="w-6 h-6 rounded-md bg-stone-900 dark:bg-stone-100 grid place-items-center shrink-0">
+      <span class="text-stone-50 dark:text-stone-900 font-bold text-[11px] mono">A</span>
+    </div>
+    <h1 class="text-[15px] font-semibold tracking-tight whitespace-nowrap truncate">AshMaize Eval <span class="text-stone-400 dark:text-stone-500 font-normal">— Scorecards</span></h1>
+  </div>
+
+  <div class="flex-1"></div>
+
+  <div class="relative hidden sm:block">
+    <input id="modelSearch" data-on="model-search" type="search" placeholder="Filter models…  ( / )"
+      class="w-44 lg:w-56 h-8 pl-7 pr-2 text-sm rounded-md bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-500 placeholder:text-stone-400" />
+    <svg class="w-3.5 h-3.5 absolute left-2.5 top-2 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+  </div>
+
+  <button data-action="add-files" title="Add scorecards from disk"
+    class="h-8 px-2.5 inline-flex items-center gap-1.5 text-xs font-medium rounded-md border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800">
+    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    <span class="hidden md:inline">Add</span>
+  </button>
+
+  <button id="chartsBtn" data-action="set-view" data-view="charts" title="Charts & comparison"
+    class="h-8 px-2.5 inline-flex items-center gap-1.5 text-xs font-medium rounded-md border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800">
+    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15v2M12 10v7M17 6v11"/></svg>
+    <span class="hidden md:inline">Charts</span>
+  </button>
+
+  <button id="compareBtn" data-action="set-view" data-view="compare" disabled
+    class="h-8 px-2.5 inline-flex items-center gap-1.5 text-xs font-semibold rounded-md bg-stone-900 text-stone-50 dark:bg-stone-100 dark:text-stone-900 disabled:opacity-35 disabled:cursor-not-allowed enabled:hover:opacity-90">
+    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3v18M15 3v18M3 9h6M15 9h6M3 15h6M15 15h6"/></svg>
+    <span id="compareBtnLabel">Compare</span>
+  </button>
+
+  <button id="themeBtn" data-action="toggle-theme" title="Toggle theme"
+    class="h-8 w-8 grid place-items-center rounded-md border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800">
+    <svg class="w-4 h-4 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    <svg class="w-4 h-4 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+  </button>
+
+  <input id="fileInput" type="file" multiple accept=".json,application/json" class="hidden" />
+</header>
+
+<main id="view" class="max-w-[1600px] mx-auto px-4 sm:px-5 py-4"></main>
+
+<footer class="max-w-[1600px] mx-auto px-4 sm:px-5 py-6 text-[11px] text-stone-400 dark:text-stone-600">
+  AshMaize Eval scorecard viewer · client-side only · discoveries via <span class="mono">scorecards/</span> directory listing, <span class="mono">manifest.json</span>, or drag-and-drop.
+</footer>
+
+<!-- dropzone overlay -->
+<div id="dropzone" class="fixed inset-0 z-40 hidden items-center justify-center bg-stone-900/40 dark:bg-black/60 backdrop-blur-sm opacity-0">
+  <div class="dz-active rounded-xl border-2 border-dashed border-stone-300 dark:border-stone-600 bg-stone-50 dark:bg-stone-900 px-10 py-8 text-center shadow-2xl">
+    <div class="text-lg font-semibold">Drop scorecards to load</div>
+    <div class="text-sm text-stone-500 dark:text-stone-400 mt-1">One or more <span class="mono">*.json</span> files</div>
+  </div>
+</div>
+
+<noscript>
+  <p style="padding:2rem;font-family:monospace">This page needs JavaScript enabled.</p>
+</noscript>
+
+<script>
+"use strict";
+/* ============================================================
+   State
+   ============================================================ */
+const state = {
+  cards: new Map(),            // slug -> { slug, json, name, error? }
+  order: [],                   // slugs in current sort/filter
+  sortKey: 'overall',
+  sortDir: 'desc',
+  expanded: new Set(),
+  selected: new Set(),
+  drill: Object.create(null),  // slug -> { failOnly, q }
+  search: '',
+  view: 'leaderboard',
+  theme: 'light',
+  loadState: 'loading',        // loading | done
+  errors: [],                  // {name, message}
+  compareDisagreeOnly: false,
+  chartsFailOnly: false,
+  scatterX: 'tokens',
+  discovery: '',
+};
+
+const VIEW = document.getElementById('view');
+const $ = (s, r=document) => r.querySelector(s);
+
+/* ============================================================
+   Utils
+   ============================================================ */
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function pct(x){
+  if (x==null || x==='' || isNaN(x)) return '—';
+  return (Math.round(Number(x)*1000)/10).toFixed(1) + '%';
+}
+function num(x){ return (x==null||isNaN(x))?null:Number(x); }
+function safeId(s){ return String(s).replace(/[^a-zA-Z0-9_-]/g,'_'); }
+
+function heatColor(t){
+  t = Math.max(0, Math.min(1, Number(t)||0));
+  let h;
+  if (t <= 0.5) h = (t/0.5)*45;          // 0 (red) -> 45 (amber)
+  else          h = 45 + ((t-0.5)/0.5)*95; // 45 -> 140 (green)
+  return `hsl(${h.toFixed(1)} 68% 44%)`;
+}
+function heat(t, big){
+  if (t==null || isNaN(t)) return `<span class="heatcell ${big?'heatcell-lg':'heatcell-sm'} heatcell-neutral">—</span>`;
+  return `<span class="heatcell ${big?'heatcell-lg':'heatcell-sm'}" style="background:${heatColor(t)}">${pct(t)}</span>`;
+}
+function pfBadge(pass){
+  if (pass===true)  return `<span class="pf pf-pass" title="pass">✓</span>`;
+  if (pass===false) return `<span class="pf pf-fail" title="fail">✕</span>`;
+  return `<span class="pf pf-na" title="not run">—</span>`;
+}
+
+function relTime(iso){
+  if (!iso) return '';
+  const t = Date.parse(iso); if (isNaN(t)) return '';
+  const d = Date.now()-t; const abs = Math.abs(d);
+  const f = [['y',31536e6],['mo',2592e6],['w',6048e5],['d',864e5],['h',36e5],['m',6e4]];
+  for (const [u,ms] of f){ if (abs>=ms){ const v=Math.round(abs/ms); return v+' '+u+' ago'; } }
+  return 'just now';
+}
+function absTime(iso){ if(!iso) return ''; try { return new Date(iso).toLocaleString(undefined,{year:'numeric',month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit'}); } catch(e){ return iso; } }
+
+function fmtTok(n){ n=num(n); if(n==null) return '—'; if(n>=1e6) return (n/1e6).toFixed(n>=1e7?0:1)+'M'; if(n>=1e3) return (n/1e3).toFixed(n>=1e4?0:1)+'k'; return ''+n; }
+function fmtSec(s){ s=num(s); if(s==null) return '—'; if(s>=60){ const m=Math.floor(s/60), r=Math.round(s%60); return m+'m'+(r?String(r).padStart(2,'0')+'s':''); } return Math.round(s)+'s'; }
+
+/* ============================================================
+   Derived data (never hardcode sections / models)
+   ============================================================ */
+function goodCards(){ return [...state.cards.values()].filter(c=>!c.error); }
+function sectionNames(){
+  const set = new Set();
+  for (const c of goodCards()){
+    for (const r of (c.json.results||[])) if (r.section) set.add(r.section);
+    for (const k of Object.keys(c.json.section_scores||{})) set.add(k);
+  }
+  const w = weightMap();
+  return [...set].sort((a,b)=>{
+    const wa = (w && w[a]!=null) ? w[a] : -1;
+    const wb = (w && w[b]!=null) ? w[b] : -1;
+    if (wa!==wb) return wb-wa;
+    return a<b?-1:a>b?1:0;
+  });
+}
+function weightMap(){ for (const c of goodCards()){ if (c.json.section_weights) return c.json.section_weights; } return null; }
+function passTotalOverall(json){ let p=0,t=0; for(const r of (json.results||[])){ t++; if(r.pass) p++; } return {pass:p,total:t}; }
+function passTotalForSection(json, sec){ let p=0,t=0; for(const r of (json.results||[])){ if(r.section===sec){ t++; if(r.pass) p++; } } return {pass:p,total:t}; }
+function hasMetrics(){ return goodCards().some(c=>c.json.metrics && typeof c.json.metrics==='object' && Object.keys(c.json.metrics).length); }
+function caseMap(json){ const m=new Map(); for(const r of (json.results||[])) m.set(r.id, r); return m; }
+
+/* ============================================================
+   Loading / discovery
+   ============================================================ */
+function addScorecard(json, name){
+  let slug = json?.harness?.slug;
+  if (!slug){ // derive from filename
+    const base = String(name||'unknown').split('/').pop().replace(/\.json$/i,'');
+    slug = base;
+  }
+  // minimal validation
+  if (!json || typeof json!=='object' || !Array.isArray(json.results)){
+    state.errors.push({name: name||slug, message:'not a valid scorecard (missing results)'});
+    render(); return;
+  }
+  if (state.cards.has(slug)){ /* replace */ }
+  state.cards.set(slug, { slug, json, name });
+}
+
+async function loadURL(url){
+  const name = url.split('/').pop();
+  try{
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const json = await r.json();
+    addScorecard(json, name);
+  }catch(e){
+    state.errors.push({name, message:e.message});
+  }finally{
+    render();
+  }
+}
+
+async function discoverAndLoad(){
+  const found = new Set();
+
+  // 1. directory listing (python http.server style)
+  try{
+    const r = await fetch('scorecards/', {cache:'no-store'});
+    if (r.ok){
+      const html = await r.text();
+      const re = /href="([^"]+)"/g; let m;
+      while ((m = re.exec(html))){
+        let href = decodeURIComponent(m[1]).split(/[?#]/)[0];
+        if (!/\.json$/i.test(href)) continue;
+        const base = href.split('/').pop();
+        if (base === 'manifest.json') continue;
+        found.add('scorecards/' + base);
+      }
+      if (found.size) state.discovery = 'directory listing';
+    }
+  }catch(e){ /* file:// or offline */ }
+
+  // 2. manifest fallback
+  if (found.size===0){
+    try{
+      const r = await fetch('scorecards/manifest.json', {cache:'no-store'});
+      if (r.ok){
+        const arr = await r.json();
+        if (Array.isArray(arr)){
+          for (const n of arr){
+            const base = String(n).split('/').pop();
+            if (/\.json$/i.test(base)) found.add('scorecards/' + base);
+          }
+          if (found.size) state.discovery = 'manifest.json';
+        }
+      }
+    }catch(e){}
+  }
+
+  if (found.size){
+    await Promise.all([...found].map(u => loadURL(u)));
+  }
+  state.loadState = 'done';
+  render();
+}
+
+/* file input + drag/drop */
+function handleFiles(fileList){
+  const files = [...fileList].filter(f => /\.json$/i.test(f.name) || f.type==='application/json');
+  if (!files.length) return;
+  state.discovery = state.discovery || 'manual';
+  files.forEach(f=>{
+    f.text().then(txt=>{
+      try{ addScorecard(JSON.parse(txt), f.name); render(); }
+      catch(e){ state.errors.push({name:f.name, message:'invalid JSON: '+e.message}); render(); }
+    }).catch(e=>{ state.errors.push({name:f.name, message:e.message}); render(); });
+  });
+}
+
+/* ============================================================
+   Sort
+   ============================================================ */
+function applySort(){
+  const arr = goodCards();
+  const key = state.sortKey;
+  const dir = state.sortDir==='asc' ? 1 : -1;
+  const val = (c)=>{
+    switch(key){
+      case 'model':     return (c.json.harness?.model_label || c.slug).toLowerCase();
+      case 'overall':   return num(c.json.overall) ?? -1;
+      case 'passrate':  { const p=passTotalOverall(c.json); return p.total? p.pass/p.total : -1; }
+      case 'tokens':    return num(c.json.metrics?.total_tokens) ?? -1;
+      case 'time':      return num(c.json.metrics?.generation_seconds) ?? -1;
+      case 'generated': { const t=Date.parse(c.json.generated_at||''); return isNaN(t)?-1:t; }
+      default:          return num(c.json.section_scores?.[key]) ?? -1; // section name
+    }
+  };
+  arr.sort((a,b)=>{
+    const va=val(a), vb=val(b);
+    if (typeof va==='string' || typeof vb==='string'){
+      return ((va<vb)?-1:(va>vb)?1:0);
+    }
+    return (va-vb)*dir;
+  });
+  state.order = arr.map(c=>c.slug);
+}
+function clickSort(key){
+  if (state.sortKey===key){ state.sortDir = state.sortDir==='asc'?'desc':'asc'; }
+  else { state.sortKey = key; state.sortDir = (key==='model')?'asc':'desc'; }
+  renderView();
+}
+
+/* ============================================================
+   Rendering — top-level
+   ============================================================ */
+function render(){
+  // theme
+  document.documentElement.classList.toggle('dark', state.theme==='dark');
+  // compare button state
+  const btn = $('#compareBtn'), lbl = $('#compareBtnLabel');
+  const n = state.selected.size;
+  btn.disabled = n < 2;
+  lbl.textContent = n>0 ? `Compare (${n})` : 'Compare';
+  renderView();
+}
+
+function renderView(){
+  applySort();
+  if (state.view==='compare'){ VIEW.innerHTML = renderCompare(); return; }
+  if (state.view==='charts'){
+    if (state.loadState==='loading' && state.cards.size===0){ VIEW.innerHTML = htmlLoading(); return; }
+    if (goodCards().length===0){ VIEW.innerHTML = htmlEmpty(); return; }
+    VIEW.innerHTML = renderCharts(); return;
+  }
+  // leaderboard
+  if (state.loadState==='loading' && state.cards.size===0){ VIEW.innerHTML = htmlLoading(); return; }
+  if (state.cards.size===0){ VIEW.innerHTML = htmlEmpty(); return; }
+  VIEW.innerHTML = renderLeaderboard();
+  // render any already-expanded drill panels
+  [...state.expanded].forEach(s => { if (state.cards.has(s)) renderDrill(s); });
+}
+
+function htmlLoading(){
+  return `<div class="flex items-center gap-3 text-sm text-stone-500 dark:text-stone-400 py-10 justify-center">
+    <span class="spinner"></span> Loading scorecards…</div>`;
+}
+
+function htmlEmpty(){
+  return `
+  <div class="max-w-xl mx-auto mt-10 text-center">
+    <div class="dz-target mx-auto rounded-xl border-2 border-dashed border-stone-300 dark:border-stone-700 px-8 py-12 bg-white dark:bg-stone-900">
+      <div class="text-base font-semibold text-stone-700 dark:text-stone-200">No scorecards loaded</div>
+      <p class="text-sm text-stone-500 dark:text-stone-400 mt-2 max-w-sm mx-auto">
+        Couldn't auto-discover <span class="mono">scorecards/*.json</span> (typical over <span class="mono">file://</span>).
+        Drop <span class="mono">.json</span> files here, or use “Add”.
+      </p>
+      <button data-action="add-files" class="mt-5 h-9 px-4 inline-flex items-center gap-1.5 text-sm font-medium rounded-md bg-stone-900 text-stone-50 dark:bg-stone-100 dark:text-stone-900 hover:opacity-90">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Choose scorecards
+      </button>
+    </div>
+    ${state.errors.length? errorsHtml():''}
+  </div>`;
+}
+
+function errorsHtml(){
+  return `<div class="mt-5 text-left">
+    <div class="text-xs font-semibold text-stone-500 mb-2 uppercase tracking-wide">Errors</div>
+    <ul class="space-y-1">
+      ${state.errors.map(e=>`<li class="text-xs flex items-start gap-2"><span class="chip" style="background:rgba(220,38,38,.12);color:#b91c1c">err</span><span class="mono text-stone-600 dark:text-stone-400">${esc(e.name)}</span><span class="text-stone-400">${esc(e.message)}</span></li>`).join('')}
+    </ul>
+  </div>`;
+}
+
+/* ============================================================
+   Leaderboard
+   ============================================================ */
+function th(key, label, opts={}){
+  const active = state.sortKey===key;
+  const tip = opts.tip ? ` title="${esc(opts.tip)}"` : '';
+  const align = opts.right ? 'text-right' : (opts.center?'text-center':'');
+  const arrow = active ? `<span class="arrow">${state.sortDir==='asc'?'▲':'▼'}</span>` : '';
+  return `<th class="th-sort ${active?'th-active':''} ${align} px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400"${tip} data-action="sort" data-key="${esc(key)}"><span class="inline-flex items-center gap-0.5">${label}${arrow}</span></th>`;
+}
+
+function renderLeaderboard(){
+  const secs = sectionNames();
+  const w = weightMap();
+  const metrics = hasMetrics();
+  const q = state.search.trim().toLowerCase();
+  const visible = state.order
+    .map(s=>state.cards.get(s))
+    .filter(c => !q || (c.json.harness?.model_label||'').toLowerCase().includes(q) || c.slug.toLowerCase().includes(q));
+
+  const weightsRibbon = w ? Object.entries(secs.map(s=>[s,w[s]]).length ? secs.map(s=>[s,w[s]]) : [])
+    .filter(([,v])=>v!=null) : [];
+  const wribbon = (w ? secs.filter(s=>w[s]!=null).map(s=>`${esc(s)} ${Math.round(w[s]*100)}%`).join(' · ') : '');
+
+  let rows = '';
+  if (visible.length===0){
+    rows = `<tr><td colspan="${9 + secs.length + (metrics?2:0)}" class="text-center text-sm text-stone-400 py-10">No models match “${esc(state.search)}”.</td></tr>`;
+  } else {
+    visible.forEach((c, i) => { rows += modelRow(c, i, secs, metrics); });
+  }
+
+  return `
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mb-3">
+    <div class="text-xs text-stone-500 dark:text-stone-400">
+      <span class="font-semibold text-stone-700 dark:text-stone-200 tabnum">${goodCards().length}</span> model${goodCards().length===1?'':'s'}
+      ${state.discovery?`<span class="text-stone-400"> · via ${esc(state.discovery)}</span>`:''}
+      ${q?` · <span class="text-stone-400">filtered to ${visible.length}</span>`:''}
+    </div>
+    <div class="flex-1"></div>
+    ${wribbon?`<div class="text-[11px] text-stone-500 dark:text-stone-400"><span class="text-stone-400 uppercase tracking-wide mr-1">weights</span>${wribbon.split(' · ').map(p=>{const [s,v]=p.split(' ');return `<span class="chip" style="background:rgba(120,113,108,.12);color:#57534e" >${s} ${v}</span>`;}).join(' ')}</div>`:''}
+    <button data-action="expand-all" class="text-[11px] text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 underline underline-offset-2">expand all</button>
+    <button data-action="collapse-all" class="text-[11px] text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 underline underline-offset-2">collapse</button>
+  </div>
+
+  <div class="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
+  <div class="overflow-x-auto">
+  <table class="w-full border-collapse text-sm">
+    <thead class="bg-stone-100 dark:bg-stone-900">
+      <tr class="border-b border-stone-200 dark:border-stone-800 text-left">
+        <th class="w-8 px-2 py-2.5"></th>
+        <th class="px-2 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-stone-400">#</th>
+        ${th('model','Model')}
+        ${th('overall','Overall',{center:true})}
+        ${secs.map(s=>th(s, esc(s), {center:true, tip: w&&w[s]!=null?`weight ${Math.round(w[s]*100)}%`:''})).join('')}
+        ${th('passrate','Pass',{center:true, tip:'overall pass rate'})}
+        ${metrics?th('tokens','Tokens',{right:true}):''}
+        ${metrics?th('time','Gen time',{right:true}):''}
+        <th class="w-10 px-2"></th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+  </div>
+  </div>
+  ${state.errors.length? `<div class="mt-3">${errorsHtml()}</div>`:''}
+  `;
+}
+
+function modelRow(c, i, secs, metrics){
+  const j = c.json;
+  const h = j.harness || {};
+  const sel = state.selected.has(c.slug);
+  const open = state.expanded.has(c.slug);
+  const pt = passTotalOverall(j);
+  const m = j.metrics;
+  const rankCls = i===0 ? 'text-stone-900 dark:text-stone-50 font-bold' : 'text-stone-400';
+  const effort = h.reasoning_effort;
+  const modelLabel = h.model_label || c.slug;
+
+  const secCells = secs.map(s=>{
+    const score = j.section_scores?.[s];
+    const p = passTotalForSection(j, s);
+    return `<td class="px-3 py-2 text-center">
+      <div class="flex flex-col items-center gap-0.5">
+        ${heat(score,false)}
+        <span class="text-[10px] text-stone-400 tabnum">${p.pass}/${p.total}</span>
+      </div>
+    </td>`;
+  }).join('');
+
+  return `
+  <tr class="model-row border-b border-stone-100 dark:border-stone-800/70 ${open?'expanded':''}" data-action="toggle-expand" data-slug="${esc(c.slug)}">
+    <td class="px-2 py-2 text-center" data-action="none">
+      <input type="checkbox" data-on="compare-select" data-slug="${esc(c.slug)}" ${sel?'checked':''} ${state.view==='compare'?'disabled':''}
+        class="w-3.5 h-3.5 rounded border-stone-400 text-stone-900 focus:ring-stone-500 align-middle" title="select to compare" />
+    </td>
+    <td class="px-2 py-2 text-center ${rankCls} tabnum text-xs">${i+1}</td>
+    <td class="px-3 py-2 min-w-[14rem]">
+      <div class="flex items-center gap-2">
+        <span class="font-medium text-stone-800 dark:text-stone-100 truncate">${esc(modelLabel)}</span>
+        ${effort?`<span class="chip" style="background:rgba(120,113,108,.14);color:#57534e">${esc(effort)}</span>`:''}
+      </div>
+      <div class="flex items-center gap-2 mt-0.5">
+        <span class="mono text-[10.5px] text-stone-400 truncate">${esc(c.slug)}</span>
+        ${j.generated_at?`<span class="text-[10.5px] text-stone-400" title="${esc(absTime(j.generated_at))}">${esc(relTime(j.generated_at))}</span>`:''}
+      </div>
+    </td>
+    <td class="px-3 py-2 text-center">${heat(j.overall, true)}</td>
+    ${secCells}
+    <td class="px-3 py-2 text-center">
+      <div class="tabnum text-xs text-stone-600 dark:text-stone-300">${pt.pass}<span class="text-stone-400">/${pt.total}</span></div>
+    </td>
+    ${metrics?`<td class="px-3 py-2 text-right tabnum text-xs text-stone-500 dark:text-stone-400">${m&&m.total_tokens!=null?fmtTok(m.total_tokens):'—'}</td>`:''}
+    ${metrics?`<td class="px-3 py-2 text-right tabnum text-xs text-stone-500 dark:text-stone-400">${m&&m.generation_seconds!=null?fmtSec(m.generation_seconds):'—'}</td>`:''}
+    <td class="px-2 text-center text-stone-400">
+      <svg class="w-3.5 h-3.5 transition-transform ${open?'rotate-90':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 6 6 6-6 6"/></svg>
+    </td>
+  </tr>
+  ${open ? `<tr class="drill-wrap"><td colspan="${9 + secs.length + (metrics?2:0)}" class="p-0">
+    ${drillPanel(c, secs, metrics)}
+  </td></tr>` : ''}
+  `;
+}
+
+/* ============================================================
+   Drill-down panel (inline expansion)
+   ============================================================ */
+function drillPanel(c, secs, metrics){
+  const sid = safeId(c.slug);
+  const d = state.drill[c.slug] || (state.drill[c.slug]={failOnly:false, q:''});
+  const j = c.json; const h = j.harness||{};
+  const failCount = (j.results||[]).filter(r=>!r.pass).length;
+
+  // metadata grid (generic harness map)
+  const metaEntries = Object.entries(h);
+
+  return `
+  <div class="fade-in bg-stone-50/60 dark:bg-stone-950/40 border-t border-stone-200 dark:border-stone-800 px-4 sm:px-5 py-4">
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mb-3">
+      <div class="text-xs font-semibold text-stone-600 dark:text-stone-300">Cases · <span class="tabnum">${(j.results||[]).length}</span> total · <span class="text-red-600 dark:text-red-400 tabnum">${failCount}</span> failing</div>
+      <div class="flex items-center gap-2">
+        <button data-action="drill-fail" data-slug="${esc(c.slug)}" class="text-[11px] px-2 py-1 rounded-md border ${d.failOnly?'bg-stone-900 text-stone-50 border-stone-900 dark:bg-stone-100 dark:text-stone-900 dark:border-stone-100':'border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-300'}">Failures only</button>
+        <input data-on="drill-q" data-slug="${esc(c.slug)}" value="${esc(d.q)}" type="search" placeholder="search case id…"
+          class="h-7 w-44 px-2 text-xs rounded-md bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 placeholder:text-stone-400" />
+      </div>
+      <div class="flex-1"></div>
+      <button data-action="toggle-expand" data-slug="${esc(c.slug)}" class="text-[11px] text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">close ✕</button>
+    </div>
+
+    <div id="drillres-${sid}" class="space-y-4"></div>
+
+    ${metrics || metaEntries.length ? `
+    <details class="mt-5 group">
+      <summary class="text-[11px] font-semibold uppercase tracking-wide text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 inline-flex items-center gap-1 select-none">
+        <svg class="w-3 h-3 transition-transform group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 6 6 6-6 6"/></svg>
+        Run metadata ${metrics?`& metrics`:''}
+      </summary>
+      <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 text-xs">
+        ${metricsBlock(j.metrics)}
+        ${metaEntries.filter(([k])=>k!=='slug').map(([k,v])=>`<div class="flex gap-2 py-0.5 border-b border-stone-100 dark:border-stone-800/60"><span class="w-44 shrink-0 text-stone-400">${esc(k)}</span><span class="mono text-stone-600 dark:text-stone-300 break-all">${esc(typeof v==='boolean'?(v?'true':'false'):v)}</span></div>`).join('')}
+      </div>
+    </details>` : ''}
+  </div>`;
+}
+
+function metricsBlock(m){
+  if (!m || typeof m!=='object') return '';
+  const row=(label,val,sub='')=>`<div class="flex gap-2 py-0.5 border-b border-stone-100 dark:border-stone-800/60"><span class="w-44 shrink-0 text-stone-400">${label}</span><span class="mono text-stone-600 dark:text-stone-300">${val}${sub?` <span class="text-stone-400">${sub}</span>`:''}</span></div>`;
+  const tokSub = (m.input_tokens!=null && m.output_tokens!=null) ? `(in ${fmtTok(m.input_tokens)} · out ${fmtTok(m.output_tokens)})` : '';
+  return [
+    m.total_tokens!=null ? row('total_tokens', fmtTok(m.total_tokens), tokSub) : '',
+    m.cached_input_tokens!=null ? row('cached_input_tokens', fmtTok(m.cached_input_tokens)) : '',
+    m.reasoning_tokens!=null ? row('reasoning_tokens', fmtTok(m.reasoning_tokens)) : '',
+    m.turns!=null ? row('turns', m.turns) : '',
+    m.item_count!=null ? row('item_count', m.item_count) : '',
+    m.generation_seconds!=null ? row('generation_seconds', fmtSec(m.generation_seconds)) : '',
+    m.grading_seconds!=null ? row('grading_seconds', fmtSec(m.grading_seconds)) : '',
+  ].join('');
+}
+
+function renderDrill(slug){
+  const c = state.cards.get(slug); if (!c) return;
+  const el = document.getElementById('drillres-'+safeId(slug)); if (!el) return;
+  const d = state.drill[slug] || (state.drill[slug]={failOnly:false,q:''});
+  const q = (d.q||'').toLowerCase();
+  const secs = sectionNames();
+  const w = weightMap();
+
+  let html=''; let shown=0;
+  for (const sec of secs){
+    let rows = (c.json.results||[]).filter(r=>r.section===sec)
+      .filter(r=> !d.failOnly || !r.pass)
+      .filter(r=> !q || String(r.id).toLowerCase().includes(q));
+    if (!rows.length) continue;
+    const p = passTotalForSection(c.json, sec);
+    const score = c.json.section_scores?.[sec];
+    shown += rows.length;
+    html += `
+      <div>
+        <div class="flex items-center gap-2 mb-1.5">
+          <span class="text-[11px] font-semibold uppercase tracking-wide text-stone-600 dark:text-stone-300">${esc(sec)}</span>
+          ${score!=null?heat(score,false):''}
+          <span class="text-[11px] text-stone-400 tabnum">${p.pass}/${p.total} pass</span>
+          ${w&&w[sec]!=null?`<span class="text-[10px] text-stone-400">· weight ${Math.round(w[sec]*100)}%</span>`:''}
+          <span class="text-[10px] text-stone-400">· ${rows.length} shown</span>
+        </div>
+        <table class="w-full text-xs">
+          <tbody>
+          ${rows.map(r=>`
+            <tr class="border-b border-stone-100 dark:border-stone-800/50">
+              <td class="py-1 pr-2 w-6">${pfBadge(r.pass)}</td>
+              <td class="py-1 pr-3 mono text-stone-700 dark:text-stone-300 whitespace-nowrap">${esc(r.id)}</td>
+              <td class="py-1 pr-2 text-stone-400 tabnum text-right w-10" title="weight">×${num(r.weight)!=null?r.weight:'?'}</td>
+              <td class="py-1 mono text-[11px] text-stone-500 dark:text-stone-400 break-all">${esc(r.detail||'')}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+  if (!shown) html = `<div class="text-sm text-stone-400 italic py-4">No cases match the current filter.</div>`;
+  el.innerHTML = html;
+}
+
+/* ============================================================
+   Compare view (side-by-side columns)
+   ============================================================ */
+function renderCompare(){
+  const sel = [...state.selected].map(s=>state.cards.get(s)).filter(c=>c&&!c.error);
+  if (sel.length < 2){
+    return `<div class="max-w-lg mx-auto mt-16 text-center">
+      <div class="text-base font-semibold">Select two or more models to compare</div>
+      <p class="text-sm text-stone-500 dark:text-stone-400 mt-2">Tick the checkbox next to each model in the leaderboard, then press <strong>Compare</strong>.</p>
+      <button data-action="set-view" data-view="leaderboard" class="mt-5 h-9 px-4 text-sm font-medium rounded-md border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800">Back to leaderboard</button>
+    </div>`;
+  }
+  const secs = sectionNames();
+  const w = weightMap();
+  const metrics = hasMetrics();
+
+  // case union
+  const union = new Map(); // id -> { slug -> result }
+  for (const c of sel){
+    for (const r of (c.json.results||[])){
+      if (!union.has(r.id)) union.set(r.id, {});
+      union.get(r.id)[c.slug] = r;
+    }
+  }
+  const disagree = (entry)=>{
+    let seenPass=false, seenFail=false;
+    for (const c of sel){ const r = entry[c.slug]; if(!r) continue; if(r.pass) seenPass=true; else seenFail=true; }
+    return seenPass && seenFail;
+  };
+  let cases = [...union.values()];
+  // but we need ids too for sort/display -> store [id, map]
+  let caseRows = [...union.entries()].map(([id,m])=>[id,m]);
+  const nDisagree = caseRows.filter(([,m])=>disagree(m)).length;
+  if (state.compareDisagreeOnly) caseRows = caseRows.filter(([,m])=>disagree(m));
+  caseRows.sort((a,b)=>{
+    const da = disagree(a[1])?0:1, db = disagree(b[1])?0:1;
+    if (da!==db) return da-db;
+    return a[0]<b[0]?-1:a[0]>b[0]?1:0;
+  });
+
+  const N = sel.length;
+  const gridTpl = `minmax(190px,1.4fr) repeat(${N}, minmax(150px,1fr))`;
+
+  const borderColor = 'border-stone-200 dark:border-stone-800';
+  const labelCls = `cmp-cell cmp-row-label bg-stone-50 dark:bg-stone-900 ${borderColor} text-xs text-stone-500 dark:text-stone-400`;
+
+  function modelCells(fn){
+    return sel.map(c=>`<div class="cmp-cell text-sm ${borderColor}">${fn(c)}</div>`).join('');
+  }
+
+  // header row
+  const header = `<div class="cmp-cell cmp-h cmp-row-label bg-stone-100 dark:bg-stone-900 ${borderColor} text-[11px] font-semibold uppercase tracking-wide text-stone-500">Case</div>` +
+    sel.map(c=>{
+      const j=c.json; const h=j.harness||{};
+      return `<div class="cmp-cell cmp-h bg-stone-100 dark:bg-stone-900 ${borderColor}">
+        <div class="flex items-center gap-1.5">
+          <span class="font-semibold text-stone-800 dark:text-stone-100 text-sm truncate">${esc(h.model_label||c.slug)}</span>
+          ${h.reasoning_effort?`<span class="chip" style="background:rgba(120,113,108,.14);color:#57534e">${esc(h.reasoning_effort)}</span>`:''}
+        </div>
+        <div class="mono text-[10px] text-stone-400 truncate">${esc(c.slug)}</div>
+      </div>`;
+    }).join('');
+
+  const overallRow = `<div class="${labelCls}">Overall</div>` +
+    sel.map(c=>`<div class="cmp-cell ${borderColor} text-center">${heat(c.json.overall,true)}</div>`).join('');
+
+  const secRows = secs.map(s=>{
+    return `<div class="${labelCls} flex items-center gap-1">${esc(s)} ${w&&w[s]!=null?`<span class="text-[10px] text-stone-400">· ${Math.round(w[s]*100)}%</span>`:''}</div>` +
+      sel.map(c=>{
+        const p = passTotalForSection(c.json, s);
+        return `<div class="cmp-cell ${borderColor} text-center">
+          <div class="flex flex-col items-center gap-0.5">
+            ${heat(c.json.section_scores?.[s], false)}
+            <span class="text-[10px] text-stone-400 tabnum">${p.pass}/${p.total}</span>
+          </div></div>`;
+      }).join('');
+  }).join('');
+
+  const passRow = `<div class="${labelCls}">Pass / total</div>` +
+    sel.map(c=>{ const p=passTotalOverall(c.json); return `<div class="cmp-cell ${borderColor} text-center tabnum text-xs text-stone-600 dark:text-stone-300">${p.pass}/${p.total}</div>`; }).join('');
+
+  const metricsRows = !metrics ? '' :
+    `<div class="${labelCls}">Tokens</div>` + sel.map(c=>`<div class="cmp-cell ${borderColor} text-right tabnum text-xs text-stone-500 dark:text-stone-400">${c.json.metrics?.total_tokens!=null?fmtTok(c.json.metrics.total_tokens):'—'}</div>`).join('')
+    + `<div class="${labelCls}">Gen time</div>` + sel.map(c=>`<div class="cmp-cell ${borderColor} text-right tabnum text-xs text-stone-500 dark:text-stone-400">${c.json.metrics?.generation_seconds!=null?fmtSec(c.json.metrics.generation_seconds):'—'}</div>`).join('');
+
+  const caseHeader = `<div class="cmp-cell cmp-h cmp-row-label bg-stone-50 dark:bg-stone-900 ${borderColor} text-[11px] font-semibold uppercase tracking-wide text-stone-500 flex items-center justify-between">
+      <span>Per-case results</span>
+      <label class="font-normal normal-case tracking-normal text-[10px] flex items-center gap-1 cursor-pointer text-stone-500">
+        <input type="checkbox" data-on="cmp-disagree" ${state.compareDisagreeOnly?'checked':''} class="w-3 h-3 rounded border-stone-400 text-stone-900 focus:ring-stone-500" /> disagreements only
+      </label>
+    </div>` +
+    sel.map(c=>`<div class="cmp-cell cmp-h bg-stone-50 dark:bg-stone-900 ${borderColor} text-[10px] text-stone-400">${caseRows.length} cases</div>`).join('');
+
+  const caseBody = caseRows.map(([id, map])=>{
+    const dis = disagree(map);
+    return `<div class="cmp-cell cmp-row-label ${dis?'cmp-disagree':''} bg-white dark:bg-stone-900 ${borderColor} mono text-[11px] text-stone-700 dark:text-stone-300 flex items-center gap-1.5">
+        ${dis?'<span class="w-1 h-3 rounded bg-red-500"></span>':''}<span class="truncate" title="${esc(id)}">${esc(id)}</span>
+      </div>` +
+      sel.map(c=>{
+        const r = map[c.slug];
+        return `<div class="cmp-cell ${borderColor} text-center ${dis?'cmp-disagree':''}">${r ? pfBadge(r.pass) : '<span class="pf pf-na">—</span>'}</div>`;
+      }).join('');
+  }).join('');
+
+  return `
+  <div class="flex items-center gap-3 mb-3 flex-wrap">
+    <button data-action="set-view" data-view="leaderboard" class="h-8 px-3 inline-flex items-center gap-1.5 text-xs font-medium rounded-md border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg> Leaderboard
+    </button>
+    <div class="text-xs text-stone-500 dark:text-stone-400">
+      Comparing <span class="font-semibold text-stone-700 dark:text-stone-200">${sel.length}</span> models
+      · <span class="text-red-600 dark:text-red-400 font-semibold">${nDisagree}</span> disagreeing case${nDisagree===1?'':'s'}
+      ${w?` · weights ${secs.filter(s=>w[s]!=null).map(s=>`${s} ${Math.round(w[s]*100)}%`).join(' · ')}`:''}
+    </div>
+  </div>
+
+  <div class="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
+    <div class="overflow-auto max-h-[75vh]">
+      <div class="cmp-grid" style="grid-template-columns:${gridTpl}">
+        ${header}
+        ${overallRow}
+        ${secRows}
+        ${passRow}
+        ${metricsRows}
+        ${caseHeader}
+        ${caseBody || `<div class="cmp-cell cmp-row-label ${borderColor} text-stone-400 italic">No cases</div>` + sel.map(()=>`<div class="cmp-cell ${borderColor}"></div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   Charts view (dependency-free inline SVG + CSS grid)
+   ============================================================ */
+const CHART_PALETTE = ['#2563eb','#0d9488','#d97706','#9333ea','#dc2626','#0891b2','#65a30d','#db2777'];
+function metricColor(i){ return i===0 ? 'currentColor' : CHART_PALETTE[(i-1)%CHART_PALETTE.length]; }
+function modelName(c){ return c.json.harness?.model_label || c.slug; }
+function shortName(s, n=16){ s=String(s); return s.length>n ? s.slice(0,n-1)+'…' : s; }
+
+function chartsModels(){
+  const q = state.search.trim().toLowerCase();
+  return state.order.map(s=>state.cards.get(s)).filter(c=>c && !c.error &&
+    (!q || (c.json.harness?.model_label||'').toLowerCase().includes(q) || c.slug.toLowerCase().includes(q)));
+}
+
+function svgBar(models, metrics){
+  const W=920,H=340,mL=42,mR=14,mT=14,mB=66;
+  const plotW=W-mL-mR, plotH=H-mT-mB, N=models.length, M=metrics.length;
+  const y0=mT+plotH, yFor=v=>mT+plotH*(1-Math.max(0,Math.min(1,v)));
+  const groupW=plotW/Math.max(1,N), innerPad=groupW*0.14, barsW=groupW-innerPad*2, barW=barsW/M;
+  let g='';
+  for(let k=0;k<=4;k++){ const v=k/4, y=yFor(v);
+    g+=`<line x1="${mL}" y1="${y.toFixed(1)}" x2="${W-mR}" y2="${y.toFixed(1)}" stroke="currentColor" stroke-opacity="0.12"/>`;
+    g+=`<text x="${mL-6}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="10" fill="currentColor" fill-opacity="0.5">${Math.round(v*100)}</text>`; }
+  models.forEach((c,gi)=>{
+    const gx=mL+groupW*gi+innerPad;
+    metrics.forEach((mk,mi)=>{
+      const v = mk==='overall'? num(c.json.overall) : num(c.json.section_scores?.[mk]);
+      if(v==null) return;
+      const x=gx+barW*mi, bh=plotH*Math.max(0,Math.min(1,v)), y=y0-bh;
+      g+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(1,barW-1.5).toFixed(1)}" height="${bh.toFixed(1)}" fill="${metricColor(mi)}" rx="1.5"><title>${esc(modelName(c))} · ${esc(mk)}: ${pct(v)}</title></rect>`;
+      if(N*M<=28) g+=`<text x="${(x+(barW-1.5)/2).toFixed(1)}" y="${(y-3).toFixed(1)}" text-anchor="middle" font-size="8.5" fill="currentColor" fill-opacity="0.6">${Math.round(v*100)}</text>`;
+    });
+    const cx=mL+groupW*gi+groupW/2;
+    g+=`<text x="${cx.toFixed(1)}" y="${(y0+17).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="currentColor" fill-opacity="0.8">${esc(shortName(modelName(c)))}</text>`;
+    const eff=c.json.harness?.reasoning_effort;
+    if(eff) g+=`<text x="${cx.toFixed(1)}" y="${(y0+30).toFixed(1)}" text-anchor="middle" font-size="8.5" fill="currentColor" fill-opacity="0.45">${esc(eff)}</text>`;
+  });
+  g+=`<line x1="${mL}" y1="${y0}" x2="${W-mR}" y2="${y0}" stroke="currentColor" stroke-opacity="0.25"/>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" font-family="inherit">${g}</svg>`;
+}
+
+function svgScatter(models){
+  const pts = models.map(c=>({c,x:num(c.json.metrics?.total_tokens),y:num(c.json.overall)})).filter(p=>p.x!=null&&p.x>0&&p.y!=null);
+  if(!pts.length) return {svg:`<div class="text-sm text-stone-400 italic py-12 text-center">No models expose <span class="mono">metrics.total_tokens</span> yet — token cost is only recorded for runs that complete a turn.</div>`, excluded:models.length};
+  const W=920,H=360,mL=46,mR=96,mT=16,mB=48, plotW=W-mL-mR, plotH=H-mT-mB;
+  const xs=pts.map(p=>Math.log10(p.x)); let lo=Math.min(...xs), hi=Math.max(...xs);
+  if(lo===hi){ lo-=0.6; hi+=0.6; } else { const pad=(hi-lo)*0.18; lo-=pad; hi+=pad; }
+  const xFor=lx=>mL+plotW*((lx-lo)/(hi-lo)), yFor=v=>mT+plotH*(1-Math.max(0,Math.min(1,v)));
+  let g='';
+  for(let k=0;k<=4;k++){ const v=k/4, y=yFor(v); g+=`<line x1="${mL}" y1="${y.toFixed(1)}" x2="${mL+plotW}" y2="${y.toFixed(1)}" stroke="currentColor" stroke-opacity="0.12"/><text x="${mL-6}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="10" fill="currentColor" fill-opacity="0.5">${Math.round(v*100)}%</text>`; }
+  for(let e=Math.ceil(lo);e<=Math.floor(hi);e++){ const x=xFor(e); const lbl = e>=6?(10**(e-6))+'M':e>=3?(10**(e-3))+'k':String(10**e); g+=`<line x1="${x.toFixed(1)}" y1="${mT}" x2="${x.toFixed(1)}" y2="${mT+plotH}" stroke="currentColor" stroke-opacity="0.08"/><text x="${x.toFixed(1)}" y="${(mT+plotH+16)}" text-anchor="middle" font-size="10" fill="currentColor" fill-opacity="0.5">${lbl}</text>`; }
+  g+=`<text x="${mL+plotW/2}" y="${H-6}" text-anchor="middle" font-size="10.5" fill="currentColor" fill-opacity="0.6">total tokens (log scale)</text>`;
+  g+=`<text transform="translate(13 ${mT+plotH/2}) rotate(-90)" text-anchor="middle" font-size="10.5" fill="currentColor" fill-opacity="0.6">overall score</text>`;
+  pts.forEach(p=>{ const x=xFor(Math.log10(p.x)), y=yFor(p.y);
+    g+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="${heatColor(p.y)}" stroke="white" stroke-width="1.5"><title>${esc(modelName(p.c))}: ${pct(p.y)} · ${fmtTok(p.x)} tokens</title></circle>`;
+    g+=`<text x="${(x+9).toFixed(1)}" y="${(y+3).toFixed(1)}" font-size="10" fill="currentColor" fill-opacity="0.8">${esc(shortName(modelName(p.c),14))}</text>`; });
+  return {svg:`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" font-family="inherit">${g}</svg>`, excluded:models.length-pts.length};
+}
+
+function chartMatrix(models){
+  const secs=sectionNames();
+  const bySec={}; for(const c of models){ for(const r of (c.json.results||[])){ (bySec[r.section]=bySec[r.section]||new Set()).add(r.id); } }
+  const maps=models.map(c=>caseMap(c.json));
+  const ncol=models.length;
+  let body=''; let shown=0, total=0;
+  for(const sec of secs){
+    const ids=[...(bySec[sec]||[])].sort();
+    let secRows='';
+    for(const id of ids){
+      total++;
+      const results=maps.map(m=>m.get(id));
+      const anyFail=results.some(r=>r && !r.pass);
+      if(state.chartsFailOnly && !anyFail) continue;
+      shown++;
+      const cells=results.map(r=>{
+        const cls=!r?'pf-na':r.pass?'pf-pass':'pf-fail', sym=!r?'–':r.pass?'✓':'✕', t=!r?'n/a':r.pass?'pass':'fail';
+        return `<td class="px-1 py-px text-center"><span class="pf ${cls}" style="width:1.05rem;height:1.05rem" title="${esc(id)} — ${t}">${sym}</span></td>`;
+      }).join('');
+      secRows+=`<tr class="border-b border-stone-100 dark:border-stone-800/40 ${anyFail?'':''}"><td class="py-px pr-3 mono text-[10.5px] text-stone-500 dark:text-stone-400 whitespace-nowrap">${esc(id)}</td>${cells}</tr>`;
+    }
+    if(!secRows) continue;
+    body+=`<tr class="bg-stone-100/70 dark:bg-stone-800/40"><td class="py-1 pr-3 text-[10px] font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">${esc(sec)}</td><td colspan="${ncol}" class="text-[10px] text-stone-400"></td></tr>${secRows}`;
+  }
+  if(!shown) body=`<tr><td colspan="${ncol+1}" class="text-center text-sm text-stone-400 italic py-6">No cases match the filter.</td></tr>`;
+  const head=`<tr class="border-b border-stone-200 dark:border-stone-800">
+     <th class="text-left px-1 pb-1.5 text-[10px] font-semibold uppercase tracking-wide text-stone-500">case</th>
+     ${models.map(c=>`<th class="px-1 pb-1.5 align-bottom"><div class="text-[10px] font-medium text-stone-600 dark:text-stone-300 truncate max-w-[7rem] mx-auto" title="${esc(modelName(c))}${c.json.harness?.reasoning_effort?' · '+esc(c.json.harness.reasoning_effort):''}">${esc(shortName(modelName(c),12))}</div>${c.json.harness?.reasoning_effort?`<div class="text-[9px] text-stone-400 text-center">${esc(c.json.harness.reasoning_effort)}</div>`:''}</th>`).join('')}
+   </tr>`;
+  return {html:`<table class="w-full text-sm border-collapse"><thead class="sticky top-0 bg-white dark:bg-stone-900 z-10">${head}</thead><tbody>${body}</tbody></table>`, shown, total};
+}
+
+function renderCharts(){
+  const models=chartsModels();
+  const q=state.search.trim();
+  if(!models.length){
+    return `${chartsToolbar(0)}<div class="text-center text-sm text-stone-400 py-16">No models match “${esc(q)}”.</div>`;
+  }
+  const secs=sectionNames();
+  const metrics=['overall',...secs];
+  const legend=metrics.map((mk,i)=>`<span class="inline-flex items-center gap-1.5 text-xs text-stone-600 dark:text-stone-300"><span style="width:11px;height:11px;border-radius:2px;display:inline-block;background:${metricColor(i)}"></span>${esc(mk)}</span>`).join('');
+  const scat=svgScatter(models);
+  const mat=chartMatrix(models);
+  const card=(title, sub, inner)=>`
+    <section class="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 mb-4">
+      <div class="flex items-baseline gap-2 flex-wrap mb-3">
+        <h2 class="text-sm font-semibold text-stone-700 dark:text-stone-200">${title}</h2>
+        ${sub?`<span class="text-[11px] text-stone-400">${sub}</span>`:''}
+      </div>
+      ${inner}
+    </section>`;
+
+  return `
+  ${chartsToolbar(models.length)}
+  ${card('Overall &amp; section scores', 'grouped by model', `
+     <div class="flex flex-wrap gap-x-4 gap-y-1 mb-2">${legend}</div>
+     <div class="text-stone-800 dark:text-stone-100">${svgBar(models,metrics)}</div>`)}
+  ${card('Quality vs. cost', scat.excluded?`${scat.excluded} model${scat.excluded===1?'':'s'} hidden (no token metrics)`:'overall score vs. total tokens — upper-left is best value', `
+     <div class="text-stone-800 dark:text-stone-100">${scat.svg}</div>`)}
+  ${card('Per-case results', `${mat.shown}/${mat.total} cases · green pass · red fail`, `
+     <div class="flex items-center gap-3 mb-2">
+       <label class="text-[11px] flex items-center gap-1.5 cursor-pointer text-stone-500 dark:text-stone-400">
+         <input type="checkbox" data-on="charts-fail" ${state.chartsFailOnly?'checked':''} class="w-3.5 h-3.5 rounded border-stone-400 text-stone-900 focus:ring-stone-500"/> failures only
+       </label>
+     </div>
+     <div class="overflow-auto max-h-[70vh] rounded-md border border-stone-100 dark:border-stone-800">${mat.html}</div>`)}
+  `;
+}
+
+function chartsToolbar(n){
+  return `<div class="flex items-center gap-3 mb-4 flex-wrap">
+    <button data-action="set-view" data-view="leaderboard" class="h-8 px-3 inline-flex items-center gap-1.5 text-xs font-medium rounded-md border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg> Leaderboard
+    </button>
+    <div class="text-xs text-stone-500 dark:text-stone-400">Charts · <span class="font-semibold text-stone-700 dark:text-stone-200">${n}</span> model${n===1?'':'s'}${state.search?` · filtered`:''}</div>
+  </div>`;
+}
+
+/* ============================================================
+   Event delegation
+   ============================================================ */
+document.addEventListener('click', (e)=>{
+  const t = e.target.closest('[data-action]');
+  if (!t) return;
+  const a = t.dataset.action;
+  if (a==='none') return;
+  switch(a){
+    case 'sort': clickSort(t.dataset.key); break;
+    case 'toggle-expand': {
+      const slug = t.dataset.slug; if(!slug) return;
+      if (state.expanded.has(slug)){ state.expanded.delete(slug); } else { state.expanded.add(slug); state.drill[slug] = state.drill[slug]||{failOnly:false,q:''}; }
+      renderView(); break;
+    }
+    case 'toggle-theme': state.theme = state.theme==='dark'?'light':'dark'; render(); break;
+    case 'set-view': state.view = t.dataset.view; render(); break;
+    case 'add-files': $('#fileInput').click(); break;
+    case 'expand-all': { goodCards().forEach(c=>{ state.expanded.add(c.slug); state.drill[c.slug]=state.drill[c.slug]||{failOnly:false,q:''}; }); renderView(); break; }
+    case 'collapse-all': state.expanded.clear(); renderView(); break;
+    case 'drill-fail': { const slug=t.dataset.slug; const d=state.drill[slug]||(state.drill[slug]={failOnly:false,q:''}); d.failOnly=!d.failOnly; renderView(); /* re-render panel to update button state */ renderDrill(slug); break; }
+  }
+});
+
+document.addEventListener('input', (e)=>{
+  const t = e.target;
+  const on = t.dataset && t.dataset.on;
+  if (!on) return;
+  if (on==='model-search'){ state.search = t.value; renderView(); }
+  else if (on==='drill-q'){ const slug=t.dataset.slug; const d=state.drill[slug]||(state.drill[slug]={failOnly:false,q:''}); d.q=t.value; renderDrill(slug); }
+});
+
+document.addEventListener('change', (e)=>{
+  const t = e.target; const on = t.dataset && t.dataset.on;
+  if (!on) return;
+  if (on==='compare-select'){
+    const slug=t.dataset.slug;
+    if (t.checked) state.selected.add(slug); else state.selected.delete(slug);
+    // update compare button without full re-render (keeps focus stable)
+    const btn=$('#compareBtn'), lbl=$('#compareBtnLabel'); const n=state.selected.size; btn.disabled=n<2; lbl.textContent=n>0?`Compare (${n})`:'Compare';
+  } else if (on==='cmp-disagree'){
+    state.compareDisagreeOnly = t.checked; renderView();
+  } else if (on==='charts-fail'){
+    state.chartsFailOnly = t.checked; renderView();
+  }
+});
+
+/* keyboard */
+document.addEventListener('keydown', (e)=>{
+  const tag = (e.target.tagName||'').toLowerCase();
+  const inField = tag==='input'||tag==='textarea'||tag==='select';
+  if (e.key==='Escape'){
+    if (state.view==='compare'){ state.view='leaderboard'; render(); return; }
+    if (inField){ e.target.blur(); return; }
+    if (state.search){ state.search=''; const s=$('#modelSearch'); if(s) s.value=''; renderView(); return; }
+  }
+  if (e.key==='/' && !inField){ e.preventDefault(); const s=$('#modelSearch'); if(s){ s.focus(); s.select(); } }
+});
+
+/* drag & drop overlay */
+const dz = $('#dropzone');
+let dzCounter = 0;
+window.addEventListener('dragenter', (e)=>{
+  if (!e.dataTransfer || ![...e.dataTransfer.types].includes('Files')) return;
+  dzCounter++; dz.classList.remove('hidden'); dz.classList.add('flex'); requestAnimationFrame(()=>dz.style.opacity='1');
+});
+window.addEventListener('dragover', (e)=>{ if([...(e.dataTransfer?.types||[])].includes('Files')) e.preventDefault(); });
+window.addEventListener('dragleave', ()=>{
+  dzCounter--; if (dzCounter<=0){ dzCounter=0; dz.style.opacity='0'; setTimeout(()=>{ dz.classList.add('hidden'); dz.classList.remove('flex'); },120); } });
+window.addEventListener('drop', (e)=>{
+  e.preventDefault(); dzCounter=0; dz.style.opacity='0'; setTimeout(()=>{ dz.classList.add('hidden'); dz.classList.remove('flex'); },120);
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length){ handleFiles(e.dataTransfer.files); }
+});
+
+/* file input */
+$('#fileInput').addEventListener('change', (e)=>{ handleFiles(e.target.files); e.target.value=''; });
+
+/* ============================================================
+   Init
+   ============================================================ */
+(function init(){
+  state.theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  render();
+  discoverAndLoad();
+})();
+</script>
+</body>
+</html>
