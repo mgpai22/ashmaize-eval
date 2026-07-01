@@ -1,0 +1,18 @@
+{
+  "id": "replay-0003-alt-instr",
+  "section": "replay",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "00112233445566778899aabbccddeeff",
+    "rom_seed_hex": "a1b2c3d4e5f60718",
+    "rom_size": 65536,
+    "nb_loops": 3,
+    "nb_instrs": 257
+  },
+  "compare": [
+    "rom_digest_hex",
+    "reg_digest_hex",
+    "hash_hex"
+  ]
+}

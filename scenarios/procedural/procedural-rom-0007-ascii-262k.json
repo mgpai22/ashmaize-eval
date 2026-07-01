@@ -1,0 +1,13 @@
+{
+  "id": "procedural-rom-0007-ascii-262k",
+  "section": "procedural",
+  "weight": 2.5,
+  "request": {
+    "op": "rom_digest",
+    "rom_seed_hex": "726f6d2d736565642d303031",
+    "rom_size": 262144
+  },
+  "compare": [
+    "rom_digest_hex"
+  ]
+}

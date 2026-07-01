@@ -1,0 +1,13 @@
+{
+  "id": "procedural-op-neg",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Neg",
+    "a_hex": "0000000000000000"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

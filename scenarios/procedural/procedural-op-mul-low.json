@@ -1,0 +1,14 @@
+{
+  "id": "procedural-op-mul-low",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Mul",
+    "a_hex": "ffffffffffffffff",
+    "b_hex": "0000000000000002"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "adversarial-0020-empty-unit-hex",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Neg",
+    "a_hex": ""
+  },
+  "expect_error": true
+}

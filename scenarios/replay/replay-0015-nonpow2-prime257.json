@@ -1,0 +1,18 @@
+{
+  "id": "replay-0015-nonpow2-prime257",
+  "section": "replay",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "6e6f6e706f77322d7072696d65",
+    "rom_seed_hex": "7072696d652d73656564",
+    "rom_size": 16448,
+    "nb_loops": 3,
+    "nb_instrs": 257
+  },
+  "compare": [
+    "rom_digest_hex",
+    "reg_digest_hex",
+    "hash_hex"
+  ]
+}

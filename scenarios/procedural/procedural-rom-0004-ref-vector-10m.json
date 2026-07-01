@@ -1,0 +1,13 @@
+{
+  "id": "procedural-rom-0004-ref-vector-10m",
+  "section": "procedural",
+  "weight": 2.5,
+  "request": {
+    "op": "rom_digest",
+    "rom_seed_hex": "313233",
+    "rom_size": 10485760
+  },
+  "compare": [
+    "rom_digest_hex"
+  ]
+}

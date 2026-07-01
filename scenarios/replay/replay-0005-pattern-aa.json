@@ -1,0 +1,18 @@
+{
+  "id": "replay-0005-pattern-aa",
+  "section": "replay",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "rom_seed_hex": "5555555555555555",
+    "rom_size": 4096,
+    "nb_loops": 8,
+    "nb_instrs": 257
+  },
+  "compare": [
+    "rom_digest_hex",
+    "reg_digest_hex",
+    "hash_hex"
+  ]
+}

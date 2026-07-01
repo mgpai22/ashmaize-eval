@@ -1,0 +1,14 @@
+{
+  "id": "adversarial-0004-nonhex",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "zz",
+    "rom_seed_hex": "00",
+    "rom_size": 4096,
+    "nb_loops": 2,
+    "nb_instrs": 256
+  },
+  "expect_error": true
+}

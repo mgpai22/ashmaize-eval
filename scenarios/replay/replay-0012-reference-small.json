@@ -1,0 +1,18 @@
+{
+  "id": "replay-0012-reference-small",
+  "section": "replay",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "68656c6c6f",
+    "rom_seed_hex": "313233",
+    "rom_size": 262144,
+    "nb_loops": 8,
+    "nb_instrs": 257
+  },
+  "compare": [
+    "rom_digest_hex",
+    "reg_digest_hex",
+    "hash_hex"
+  ]
+}

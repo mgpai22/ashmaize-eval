@@ -1,0 +1,14 @@
+{
+  "id": "procedural-op-hash1",
+  "section": "procedural",
+  "weight": 0.5,
+  "request": {
+    "op": "unit",
+    "instr": "Hash1",
+    "a_hex": "0123456789abcdef",
+    "b_hex": "fedcba9876543210"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "procedural-op-add-wrap",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Add",
+    "a_hex": "ffffffffffffffff",
+    "b_hex": "0000000000000001"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "procedural-op-bitrev",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "BitRev",
+    "a_hex": "8000000000000001"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

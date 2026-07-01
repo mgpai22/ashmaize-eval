@@ -1,0 +1,18 @@
+{
+  "id": "replay-0010-prime-bytes",
+  "section": "replay",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "020305070b0d1113171d",
+    "rom_seed_hex": "1f252b31353b",
+    "rom_size": 4096,
+    "nb_loops": 3,
+    "nb_instrs": 256
+  },
+  "compare": [
+    "rom_digest_hex",
+    "reg_digest_hex",
+    "hash_hex"
+  ]
+}

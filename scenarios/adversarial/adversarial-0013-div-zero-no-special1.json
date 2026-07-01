@@ -1,0 +1,12 @@
+{
+  "id": "adversarial-0013-div-zero-no-special1",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Div",
+    "a_hex": "0000000000000001",
+    "b_hex": "0000000000000000"
+  },
+  "expect_error": true
+}

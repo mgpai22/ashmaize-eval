@@ -1,0 +1,11 @@
+{
+  "id": "adversarial-0009-non-multiple-rom-size",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "rom_digest",
+    "rom_seed_hex": "00",
+    "rom_size": 65
+  },
+  "expect_error": true
+}

@@ -1,0 +1,14 @@
+{
+  "id": "procedural-op-div",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Div",
+    "a_hex": "0000000000000010",
+    "b_hex": "0000000000000003"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

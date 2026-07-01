@@ -1,0 +1,13 @@
+{
+  "id": "procedural-rom-0009-nonpow2-65chunks",
+  "section": "procedural",
+  "weight": 2.5,
+  "request": {
+    "op": "rom_digest",
+    "rom_seed_hex": "7461696c3333",
+    "rom_size": 4160
+  },
+  "compare": [
+    "rom_digest_hex"
+  ]
+}

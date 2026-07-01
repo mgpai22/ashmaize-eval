@@ -1,0 +1,15 @@
+{
+  "id": "procedural-op-mod-zero",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Mod",
+    "a_hex": "0000000000001234",
+    "b_hex": "0000000000000000",
+    "special1_hex": "0123456789abcdef"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

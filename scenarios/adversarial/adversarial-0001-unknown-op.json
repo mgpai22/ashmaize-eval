@@ -1,0 +1,9 @@
+{
+  "id": "adversarial-0001-unknown-op",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "bogus"
+  },
+  "expect_error": true
+}

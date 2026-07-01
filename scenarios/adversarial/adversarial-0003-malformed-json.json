@@ -1,0 +1,7 @@
+{
+  "id": "adversarial-0003-malformed-json",
+  "section": "adversarial",
+  "weight": 1.0,
+  "raw_request": "{not json",
+  "expect_error": true
+}

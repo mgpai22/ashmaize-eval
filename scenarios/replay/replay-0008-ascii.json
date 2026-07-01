@@ -1,0 +1,18 @@
+{
+  "id": "replay-0008-ascii",
+  "section": "replay",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "6368616c6c656e67652d303031",
+    "rom_seed_hex": "726f6d2d736565642d303031",
+    "rom_size": 65536,
+    "nb_loops": 8,
+    "nb_instrs": 257
+  },
+  "compare": [
+    "rom_digest_hex",
+    "reg_digest_hex",
+    "hash_hex"
+  ]
+}

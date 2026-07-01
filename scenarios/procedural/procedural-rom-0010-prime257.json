@@ -1,0 +1,13 @@
+{
+  "id": "procedural-rom-0010-prime257",
+  "section": "procedural",
+  "weight": 2.5,
+  "request": {
+    "op": "rom_digest",
+    "rom_seed_hex": "7072696d652d73656564",
+    "rom_size": 16448
+  },
+  "compare": [
+    "rom_digest_hex"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "replay-0014-nonpow2-mid",
+  "section": "replay",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "00112233445566778899aabbccddeeff",
+    "rom_seed_hex": "deadbeefcafef00d",
+    "rom_size": 196608,
+    "nb_loops": 3,
+    "nb_instrs": 257
+  },
+  "compare": [
+    "rom_digest_hex",
+    "reg_digest_hex",
+    "hash_hex"
+  ]
+}

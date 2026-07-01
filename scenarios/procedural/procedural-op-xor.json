@@ -1,0 +1,14 @@
+{
+  "id": "procedural-op-xor",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Xor",
+    "a_hex": "00ff00ff00ff00ff",
+    "b_hex": "ff00ff00ff00ff00"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

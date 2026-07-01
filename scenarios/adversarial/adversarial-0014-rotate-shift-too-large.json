@@ -1,0 +1,12 @@
+{
+  "id": "adversarial-0014-rotate-shift-too-large",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "RotL",
+    "a_hex": "0000000000000001",
+    "shift": 32
+  },
+  "expect_error": true
+}

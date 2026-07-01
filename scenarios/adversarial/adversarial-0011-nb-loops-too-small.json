@@ -1,0 +1,14 @@
+{
+  "id": "adversarial-0011-nb-loops-too-small",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "00",
+    "rom_seed_hex": "00",
+    "rom_size": 4096,
+    "nb_loops": 1,
+    "nb_instrs": 256
+  },
+  "expect_error": true
+}

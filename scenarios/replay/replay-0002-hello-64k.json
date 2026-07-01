@@ -1,0 +1,18 @@
+{
+  "id": "replay-0002-hello-64k",
+  "section": "replay",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "68656c6c6f",
+    "rom_seed_hex": "313233",
+    "rom_size": 65536,
+    "nb_loops": 8,
+    "nb_instrs": 256
+  },
+  "compare": [
+    "rom_digest_hex",
+    "reg_digest_hex",
+    "hash_hex"
+  ]
+}

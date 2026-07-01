@@ -1,0 +1,13 @@
+{
+  "id": "procedural-rom-0006-ff-4k",
+  "section": "procedural",
+  "weight": 2.5,
+  "request": {
+    "op": "rom_digest",
+    "rom_seed_hex": "ff",
+    "rom_size": 4096
+  },
+  "compare": [
+    "rom_digest_hex"
+  ]
+}

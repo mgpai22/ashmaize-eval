@@ -1,0 +1,18 @@
+{
+  "id": "replay-0004-zero-seed-262k",
+  "section": "replay",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "ffffffffffffffff",
+    "rom_seed_hex": "000102030405060708090a0b0c0d0e0f",
+    "rom_size": 262144,
+    "nb_loops": 2,
+    "nb_instrs": 256
+  },
+  "compare": [
+    "rom_digest_hex",
+    "reg_digest_hex",
+    "hash_hex"
+  ]
+}

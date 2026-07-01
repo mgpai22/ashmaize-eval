@@ -1,0 +1,14 @@
+{
+  "id": "procedural-op-rotl-0",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "RotL",
+    "a_hex": "0123456789abcdef",
+    "shift": 0
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

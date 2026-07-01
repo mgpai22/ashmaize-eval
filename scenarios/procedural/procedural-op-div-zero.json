@@ -1,0 +1,15 @@
+{
+  "id": "procedural-op-div-zero",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Div",
+    "a_hex": "0000000000001234",
+    "b_hex": "0000000000000000",
+    "special1_hex": "feedfacecafebeef"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

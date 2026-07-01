@@ -1,0 +1,11 @@
+{
+  "id": "adversarial-0017-string-rom-size",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "rom_digest",
+    "rom_seed_hex": "00",
+    "rom_size": "4096"
+  },
+  "expect_error": true
+}

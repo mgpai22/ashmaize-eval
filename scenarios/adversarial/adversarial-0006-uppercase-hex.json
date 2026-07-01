@@ -1,0 +1,11 @@
+{
+  "id": "adversarial-0006-uppercase-hex",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "rom_digest",
+    "rom_seed_hex": "AB",
+    "rom_size": 4096
+  },
+  "expect_error": true
+}

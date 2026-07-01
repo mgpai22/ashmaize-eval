@@ -1,0 +1,14 @@
+{
+  "id": "procedural-op-and",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "And",
+    "a_hex": "0f0f0f0f0f0f0f0f",
+    "b_hex": "00ff00ff00ff00ff"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}
