@@ -160,6 +160,50 @@ Coding Plan models include `glm-4.7` and `glm-5-turbo`, and `glm-5.2[1m]` enable
 enabled by default). Only Codex's own API traffic leaves the generation container (now via the
 bridge); model-spawned commands stay offline under `cli.workspace_write.network_access: false`.
 
+## Benchmark Claude through CLIProxyAPI
+
+Modern Codex only speaks the OpenAI **Responses API**; Claude Code accounts authenticate over
+**OAuth**. The `claude` harness bridges that gap with a managed [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)
+sidecar built from `container/cliproxy.Dockerfile`, which exposes an OpenAI Responses endpoint and
+translates it to Claude using stored Claude Code OAuth tokens. When the `claude` harness runs, the
+runner renders `container/cliproxy-config.yaml` (substituting the local bearer key), starts the
+sidecar on a per-run private Docker network with the OAuth token directory mounted, points Codex at
+it (`model_provider` + a `[model_providers.<id>]` block with `wire_api = "responses"`), waits for
+`GET /healthz`, and tears it down afterward.
+
+```bash
+docker build -t ashmaize-cliproxy -f container/cliproxy.Dockerfile .
+export CLIPROXY_API_KEY="$(openssl rand -hex 24)"
+./bin/run-codex auth claude-login -harness claude
+./bin/run-codex auth status -harness claude
+./bin/run-codex run -harness claude -slug claude-opus-4-5
+```
+
+`CLIPROXY_API_KEY` is the **local bearer key** Codex uses to call the private sidecar — it is not an
+Anthropic key and never leaves your machine. `auth claude-login` runs the sidecar interactively so you
+can open the printed Claude OAuth URL and complete browser login; the resulting Claude OAuth tokens
+are stored under the gitignored `.codex-eval/cliproxy-auth` directory (`auth status` reports only the
+token-file count, never token contents). The sidecar is attached to a per-run private Docker network,
+and the candidate's model-spawned commands still run with `cli.workspace_write.network_access: false`.
+The checked-in `claude` harness uses exact model `claude-opus-4-5-20251101` with
+`cli.reasoning_effort: high` and `cli.model_supports_reasoning_summaries: true`.
+
+### Claude extended thinking
+
+Codex only sends reasoning parameters for models whose family advertises reasoning support, and it
+doesn't recognize provider models, so it defaults that off. The harness sets
+`cli.model_supports_reasoning_summaries: true` to force Codex to emit `reasoning.effort`; CLIProxyAPI
+maps that effort onto Claude's `thinking` config, so extended thinking runs end to end. This is
+verified: an identical request with `reasoning_effort: high` returns Claude `thinking` blocks and
+~5x the `output_tokens` of one with reasoning disabled. Valid Codex efforts are `minimal`, `low`,
+`medium`, `high`, and `xhigh` (not `max`); `high` maps to a 24576-token Claude thinking budget, which
+CLIProxyAPI clamps below the request's `max_tokens`, so higher efforts can starve the response on
+this model — `high` is the safe deepest setting here.
+
+Because CLIProxyAPI's Claude->Responses translation does not split reasoning tokens back out, the
+scorecard reports `reasoning_tokens: 0` even while thinking is active. The thinking tokens are still
+counted inside `output_tokens`, so `total_tokens` and cost stay accurate.
+
 ## Scorecard metrics
 
 Each harness run adds a `metrics` block to `scorecards/<slug>.json`, parsed from the Codex

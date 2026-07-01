@@ -1,0 +1,17 @@
+host: ""
+port: 8317
+auth-dir: "/root/.cli-proxy-api"
+api-keys:
+  - "{{PROVIDER_KEY}}"
+debug: false
+commercial-mode: true
+logging-to-file: false
+request-retry: 5
+max-retry-credentials: 0
+max-retry-interval: 30
+disable-claude-cloak-mode: false
+ws-auth: true
+nonstream-keepalive-interval: 15
+streaming:
+  keepalive-seconds: 15
+  bootstrap-retries: 1

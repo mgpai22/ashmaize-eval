@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -69,13 +70,14 @@ type dockerConfig struct {
 }
 
 type cliConfig struct {
-	SandboxMode     string               `yaml:"sandbox_mode"`
-	ApprovalPolicy  string               `yaml:"approval_policy"`
-	WebSearch       string               `yaml:"web_search"`
-	ReasoningEffort string               `yaml:"reasoning_effort"`
-	AllowLoginShell bool                 `yaml:"allow_login_shell"`
-	WorkspaceWrite  workspaceWriteConfig `yaml:"workspace_write"`
-	ExecFlags       []string             `yaml:"exec_flags"`
+	SandboxMode                     string               `yaml:"sandbox_mode"`
+	ApprovalPolicy                  string               `yaml:"approval_policy"`
+	WebSearch                       string               `yaml:"web_search"`
+	ReasoningEffort                 string               `yaml:"reasoning_effort"`
+	ModelSupportsReasoningSummaries *bool                `yaml:"model_supports_reasoning_summaries"`
+	AllowLoginShell                 bool                 `yaml:"allow_login_shell"`
+	WorkspaceWrite                  workspaceWriteConfig `yaml:"workspace_write"`
+	ExecFlags                       []string             `yaml:"exec_flags"`
 }
 
 type workspaceWriteConfig struct {
@@ -97,10 +99,18 @@ type providerConfig struct {
 }
 
 type bridgeConfig struct {
-	Image           string `yaml:"image"`
-	Dockerfile      string `yaml:"dockerfile"`
-	Port            int    `yaml:"port"`
-	UpstreamBaseURL string `yaml:"upstream_base_url"`
+	Image           string            `yaml:"image"`
+	Dockerfile      string            `yaml:"dockerfile"`
+	Port            int               `yaml:"port"`
+	UpstreamBaseURL string            `yaml:"upstream_base_url"`
+	HealthPath      string            `yaml:"health_path"`
+	BasePath        string            `yaml:"base_path"`
+	KeyContainerEnv string            `yaml:"key_container_env"`
+	Env             map[string]string `yaml:"env"`
+	ConfigTemplate  string            `yaml:"config_template"`
+	ConfigTarget    string            `yaml:"config_target"`
+	AuthHome        string            `yaml:"auth_home"`
+	AuthTarget      string            `yaml:"auth_target"`
 }
 
 type commonOptions struct {
@@ -146,6 +156,7 @@ func usage() {
   run-codex auth login-api-key [-config <path>] [-repo <path>] [-harness <id>]
   run-codex auth login-access-token [-config <path>] [-repo <path>] [-harness <id>]
   run-codex auth import-host [-config <path>] [-repo <path>] [-harness <id>]
+  run-codex auth claude-login [-config <path>] [-repo <path>] [-harness claude]
 `)
 }
 
@@ -196,7 +207,14 @@ func authSubcommand(args []string) error {
 		return err
 	}
 	if cfg.Provider != nil {
-		return fmt.Errorf("auth subcommands are not applicable to provider-backed harness %q; set the %s environment variable and run directly", cfg.ID, cfg.Provider.KeyEnv)
+		switch action {
+		case "status":
+			return providerAuthStatus(repoRoot, cfg)
+		case "claude-login":
+			return providerClaudeLogin(repoRoot, cfg)
+		default:
+			return fmt.Errorf("auth subcommand %q is not applicable to provider-backed harness %q", action, cfg.ID)
+		}
 	}
 
 	switch action {
@@ -374,9 +392,6 @@ func validateConfig(cfg harnessConfig) error {
 		if p.Bridge.Dockerfile == "" {
 			pmissing = append(pmissing, "provider.bridge.dockerfile")
 		}
-		if p.Bridge.UpstreamBaseURL == "" {
-			pmissing = append(pmissing, "provider.bridge.upstream_base_url")
-		}
 		if len(pmissing) > 0 {
 			return fmt.Errorf("missing required config fields: %s", strings.Join(pmissing, ", "))
 		}
@@ -385,6 +400,23 @@ func validateConfig(cfg harnessConfig) error {
 		}
 		if p.Bridge.Port <= 0 {
 			return errors.New("provider.bridge.port must be > 0")
+		}
+		if p.Bridge.HealthPath != "" && !strings.HasPrefix(p.Bridge.HealthPath, "/") {
+			return fmt.Errorf("provider.bridge.health_path %q must start with \"/\"", p.Bridge.HealthPath)
+		}
+		if p.Bridge.BasePath != "" && !strings.HasPrefix(p.Bridge.BasePath, "/") {
+			return fmt.Errorf("provider.bridge.base_path %q must start with \"/\"", p.Bridge.BasePath)
+		}
+		for k := range p.Bridge.Env {
+			if k == "" || strings.Contains(k, "=") {
+				return fmt.Errorf("provider.bridge.env has invalid key %q (must be non-empty and contain no \"=\")", k)
+			}
+		}
+		if (p.Bridge.ConfigTemplate == "") != (p.Bridge.ConfigTarget == "") {
+			return errors.New("provider.bridge.config_template and provider.bridge.config_target must be set together")
+		}
+		if (p.Bridge.AuthHome == "") != (p.Bridge.AuthTarget == "") {
+			return errors.New("provider.bridge.auth_home and provider.bridge.auth_target must be set together")
 		}
 	}
 	return nil
@@ -574,6 +606,9 @@ func renderCodexConfig(cfg harnessConfig, bridgeAddr string) []byte {
 	if c.ReasoningEffort != "" {
 		fmt.Fprintf(&b, "model_reasoning_effort = %s\n", strconv.Quote(c.ReasoningEffort))
 	}
+	if c.ModelSupportsReasoningSummaries != nil {
+		fmt.Fprintf(&b, "model_supports_reasoning_summaries = %t\n", *c.ModelSupportsReasoningSummaries)
+	}
 	fmt.Fprintf(&b, "sandbox_mode = %s\n", strconv.Quote(c.SandboxMode))
 	fmt.Fprintf(&b, "approval_policy = %s\n", strconv.Quote(c.ApprovalPolicy))
 	fmt.Fprintf(&b, "web_search = %s\n", strconv.Quote(c.WebSearch))
@@ -713,8 +748,15 @@ func ensureBridgeImage(repoRoot string, b bridgeConfig) error {
 	return annotateCmdErr("build bridge image "+b.Image, cmd.Run())
 }
 
-func waitBridgeHealth(net, agentImage, name string, port int) error {
-	url := fmt.Sprintf("http://%s:%d/health", name, port)
+func bridgeHealthPath(b bridgeConfig) string {
+	if b.HealthPath == "" {
+		return "/health"
+	}
+	return b.HealthPath
+}
+
+func waitBridgeHealth(net, agentImage, name string, port int, healthPath string) error {
+	url := fmt.Sprintf("http://%s:%d%s", name, port, healthPath)
 	deadline := time.Now().Add(30 * time.Second)
 	var lastErr error
 	for time.Now().Before(deadline) {
@@ -729,12 +771,52 @@ func waitBridgeHealth(net, agentImage, name string, port int) error {
 	return fmt.Errorf("bridge %s did not become healthy: %v", name, lastErr)
 }
 
+// prepareBridgeMounts renders any configured sidecar config template (with the
+// provider key substituted) into a temp file and prepares the persistent auth
+// mount. It returns docker -v args plus a cleanup that removes only the temp
+// rendered config dir; it never deletes the persistent auth home.
+func prepareBridgeMounts(repoRoot string, cfg harnessConfig, providerKey string) (args []string, cleanup func(), err error) {
+	b := cfg.Provider.Bridge
+	cleanup = func() {}
+	if b.ConfigTemplate != "" {
+		tmpl, rerr := os.ReadFile(resolvePath(repoRoot, b.ConfigTemplate))
+		if rerr != nil {
+			return nil, nil, fmt.Errorf("read bridge config template: %w", rerr)
+		}
+		rendered := strings.ReplaceAll(string(tmpl), "{{PROVIDER_KEY}}", providerKey)
+		tmpDir, terr := os.MkdirTemp("", "ashmaize-bridge-cfg-")
+		if terr != nil {
+			return nil, nil, terr
+		}
+		cleanup = func() { _ = os.RemoveAll(tmpDir) }
+		cfgPath := filepath.Join(tmpDir, "config.yaml")
+		if werr := os.WriteFile(cfgPath, []byte(rendered), 0o600); werr != nil {
+			cleanup()
+			return nil, nil, werr
+		}
+		args = append(args, "-v", cfgPath+":"+b.ConfigTarget+":ro")
+	}
+	if b.AuthHome != "" {
+		authHome := resolvePath(repoRoot, b.AuthHome)
+		if merr := os.MkdirAll(authHome, 0o700); merr != nil {
+			cleanup()
+			return nil, nil, merr
+		}
+		if cerr := os.Chmod(authHome, 0o700); cerr != nil {
+			cleanup()
+			return nil, nil, cerr
+		}
+		args = append(args, "-v", authHome+":"+b.AuthTarget)
+	}
+	return args, cleanup, nil
+}
+
 // startBridge launches the translation proxy sidecar on a per-run Docker network
 // and returns the in-network base URL Codex should use plus a cleanup function.
 func startBridge(repoRoot string, cfg harnessConfig, slug, transcriptDir string) (string, func(), error) {
 	p := cfg.Provider
-	key := os.Getenv(p.KeyEnv)
-	if key == "" {
+	providerKey := os.Getenv(p.KeyEnv)
+	if providerKey == "" {
 		return "", nil, fmt.Errorf("provider requires the %s environment variable to hold the API key", p.KeyEnv)
 	}
 	if err := ensureBridgeImage(repoRoot, p.Bridge); err != nil {
@@ -747,32 +829,48 @@ func startBridge(repoRoot string, cfg harnessConfig, slug, transcriptDir string)
 	if out, err := exec.Command("docker", "network", "create", net).CombinedOutput(); err != nil {
 		return "", nil, fmt.Errorf("create bridge network: %v: %s", err, out)
 	}
+	mountArgs, mountCleanup, err := prepareBridgeMounts(repoRoot, cfg, providerKey)
+	if err != nil {
+		_ = exec.Command("docker", "network", "rm", net).Run()
+		return "", nil, err
+	}
 	cleanup := func() {
 		if logs, err := exec.Command("docker", "logs", name).CombinedOutput(); err == nil {
 			_ = os.WriteFile(filepath.Join(transcriptDir, "bridge.log"), logs, 0o644)
 		}
 		_ = exec.Command("docker", "rm", "-f", name).Run()
 		_ = exec.Command("docker", "network", "rm", net).Run()
+		mountCleanup()
 	}
-	runArgs := []string{
-		"run", "-d", "--name", name, "--network", net,
-		"-e", "ZAI_API_KEY", "-e", "HOST=0.0.0.0",
-		"-e", fmt.Sprintf("PORT=%d", p.Bridge.Port),
-		"-e", "ZAI_BASE_URL=" + p.Bridge.UpstreamBaseURL,
-		"-e", "ALLOW_TOOLS=1",
-		p.Bridge.Image,
+	runArgs := []string{"run", "-d", "--name", name, "--network", net}
+	envKeys := make([]string, 0, len(p.Bridge.Env))
+	for k := range p.Bridge.Env {
+		envKeys = append(envKeys, k)
 	}
+	sort.Strings(envKeys)
+	for _, k := range envKeys {
+		runArgs = append(runArgs, "-e", k+"="+p.Bridge.Env[k])
+	}
+	var cmdEnv []string
+	if p.Bridge.KeyContainerEnv != "" {
+		runArgs = append(runArgs, "-e", p.Bridge.KeyContainerEnv)
+		cmdEnv = append(os.Environ(), p.Bridge.KeyContainerEnv+"="+providerKey)
+	}
+	runArgs = append(runArgs, mountArgs...)
+	runArgs = append(runArgs, p.Bridge.Image)
 	start := exec.Command("docker", runArgs...)
-	start.Env = append(os.Environ(), "ZAI_API_KEY="+key)
+	if cmdEnv != nil {
+		start.Env = cmdEnv
+	}
 	if out, err := start.CombinedOutput(); err != nil {
 		cleanup()
 		return "", nil, fmt.Errorf("start bridge: %v: %s", err, out)
 	}
-	if err := waitBridgeHealth(net, cfg.Images.Agent.Name, name, p.Bridge.Port); err != nil {
+	if err := waitBridgeHealth(net, cfg.Images.Agent.Name, name, p.Bridge.Port, bridgeHealthPath(p.Bridge)); err != nil {
 		cleanup()
 		return "", nil, err
 	}
-	return fmt.Sprintf("http://%s:%d", name, p.Bridge.Port), cleanup, nil
+	return fmt.Sprintf("http://%s:%d%s", name, p.Bridge.Port, p.Bridge.BasePath), cleanup, nil
 }
 
 func runCodex(repoRoot string, cfg harnessConfig, slug, workspace, transcriptDir string) error {
@@ -1001,7 +1099,10 @@ func annotateScorecard(repoRoot string, cfg harnessConfig, slug string, paths ru
 	if cfg.Provider != nil {
 		harness["model_provider"] = cfg.Provider.ID
 		harness["provider_wire_api"] = cfg.Provider.WireAPI
-		harness["provider_upstream_base_url"] = cfg.Provider.Bridge.UpstreamBaseURL
+		if cfg.Provider.Bridge.UpstreamBaseURL != "" {
+			harness["provider_upstream_base_url"] = cfg.Provider.Bridge.UpstreamBaseURL
+		}
+		harness["provider_bridge_health_path"] = bridgeHealthPath(cfg.Provider.Bridge)
 		harness["provider_bridge_image"] = cfg.Provider.Bridge.Image
 		harness["bridge_log"] = filepath.ToSlash(filepath.Join("transcripts", slug, "bridge.log"))
 	}
@@ -1072,6 +1173,67 @@ func authLogin(repoRoot string, cfg harnessConfig, loginArgs []string, tty bool)
 		return fmt.Errorf("copy Codex auth.json after login: %w", err)
 	}
 	return nil
+}
+
+func providerAuthStatus(repoRoot string, cfg harnessConfig) error {
+	if cfg.Provider == nil || cfg.Provider.Bridge.AuthHome == "" {
+		return errors.New("provider auth status requires provider.bridge.auth_home")
+	}
+	authHome := resolvePath(repoRoot, cfg.Provider.Bridge.AuthHome)
+	count := 0
+	if entries, err := os.ReadDir(authHome); err == nil {
+		for _, e := range entries {
+			if e.Type().IsRegular() && strings.HasSuffix(e.Name(), ".json") {
+				count++
+			}
+		}
+	}
+	fmt.Printf("provider auth home: %s\n", authHome)
+	fmt.Printf("provider auth files: %d\n", count)
+	if count == 0 {
+		return fmt.Errorf("no provider auth files found; run run-codex auth claude-login -harness %s", cfg.ID)
+	}
+	return nil
+}
+
+// providerClaudeLogin runs the managed CLIProxyAPI sidecar interactively to
+// complete Claude Code OAuth. The rendered config and persistent auth mount come
+// from prepareBridgeMounts; the OAuth callback is served on the fixed bridge port
+// so the printed login URL's redirect matches.
+func providerClaudeLogin(repoRoot string, cfg harnessConfig) error {
+	if cfg.Provider == nil {
+		return errors.New("claude-login requires a provider-backed harness")
+	}
+	b := cfg.Provider.Bridge
+	if b.ConfigTemplate == "" || b.ConfigTarget == "" || b.AuthHome == "" || b.AuthTarget == "" {
+		return errors.New("claude-login requires provider.bridge.config_template, config_target, auth_home, and auth_target")
+	}
+	providerKey := os.Getenv(cfg.Provider.KeyEnv)
+	if providerKey == "" {
+		return fmt.Errorf("provider requires the %s environment variable to hold the local bearer key", cfg.Provider.KeyEnv)
+	}
+	if err := ensureBridgeImage(repoRoot, b); err != nil {
+		return err
+	}
+	mountArgs, cleanup, err := prepareBridgeMounts(repoRoot, cfg, providerKey)
+	if err != nil {
+		return err
+	}
+	defer cleanup()
+	args := []string{"run", "--rm", "-i", "-p", fmt.Sprintf("127.0.0.1:%d:%d", b.Port, b.Port)}
+	args = append(args, mountArgs...)
+	args = append(args, b.Image,
+		"./CLIProxyAPI", "-config", b.ConfigTarget, "-claude-login", "-no-browser",
+		"-oauth-callback-port", strconv.Itoa(b.Port),
+	)
+	cmd := exec.Command("docker", args...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return annotateCmdErr("Claude OAuth login through CLIProxyAPI", err)
+	}
+	return providerAuthStatus(repoRoot, cfg)
 }
 
 func copyWorkspaceFiles(repoRoot, workspace string, files []workspaceFile) error {

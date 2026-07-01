@@ -108,3 +108,142 @@ harnesses:
         dockerfile: container/zai-bridge.Dockerfile
         port: 31415
         upstream_base_url: https://api.z.ai/api/coding/paas/v4
+        health_path: /health
+        key_container_env: ZAI_API_KEY
+        env:
+          HOST: "0.0.0.0"
+          PORT: "31415"
+          ZAI_BASE_URL: https://api.z.ai/api/coding/paas/v4
+          ALLOW_TOOLS: "1"
+  claude:
+    driver: codex
+    images:
+      agent:
+        name: ashmaize-eval-agent
+        target: agent
+      grader:
+        name: ashmaize-eval-grader
+        target: grader
+    prompt: harness/prompts/ashmaize_codex.txt
+    auth_home: .codex-eval/codex-home
+    model: claude-opus-4-5-20251101
+    attempt_timeout: 4h
+    grader_timeout: 120s
+    workspace:
+      files:
+        - source: spec/TASK.md
+          target: /workspace/spec/TASK.md
+        - source: spec/ABI.md
+          target: /workspace/spec/ABI.md
+        - source: spec/ASHMAIZE.md
+          target: /workspace/spec/ASHMAIZE.md
+        - source: harness/prompts/workspace_agents.md
+          target: /workspace/AGENTS.md
+    docker:
+      flags:
+        - --cap-add=SYS_ADMIN
+        - --cap-add=SYS_CHROOT
+        - --cap-add=SETUID
+        - --cap-add=SETGID
+        - --cap-add=SYS_PTRACE
+        - --cap-add=NET_ADMIN
+        - --cap-add=NET_RAW
+        - --security-opt=seccomp=unconfined
+        - --security-opt=apparmor=unconfined
+    cli:
+      sandbox_mode: workspace-write
+      approval_policy: never
+      web_search: disabled
+      reasoning_effort: high
+      model_supports_reasoning_summaries: true
+      allow_login_shell: false
+      workspace_write:
+        network_access: false
+      exec_flags:
+        - --strict-config
+        - --json
+        - --ephemeral
+        - --skip-git-repo-check
+    provider:
+      id: cliproxy_claude
+      name: CLIProxyAPI Claude Code
+      wire_api: responses
+      api_key_env: OPENAI_API_KEY
+      key_env: CLIPROXY_API_KEY
+      stream_idle_timeout_ms: 3000000
+      bridge:
+        image: ashmaize-cliproxy
+        dockerfile: container/cliproxy.Dockerfile
+        port: 8317
+        health_path: /healthz
+        base_path: /v1
+        config_template: container/cliproxy-config.yaml
+        config_target: /CLIProxyAPI/config.yaml
+        auth_home: .codex-eval/cliproxy-auth
+        auth_target: /root/.cli-proxy-api
+  claude-sonnet-5:
+    driver: codex
+    images:
+      agent:
+        name: ashmaize-eval-agent
+        target: agent
+      grader:
+        name: ashmaize-eval-grader
+        target: grader
+    prompt: harness/prompts/ashmaize_codex.txt
+    auth_home: .codex-eval/codex-home
+    model: claude-sonnet-5
+    attempt_timeout: 4h
+    grader_timeout: 120s
+    workspace:
+      files:
+        - source: spec/TASK.md
+          target: /workspace/spec/TASK.md
+        - source: spec/ABI.md
+          target: /workspace/spec/ABI.md
+        - source: spec/ASHMAIZE.md
+          target: /workspace/spec/ASHMAIZE.md
+        - source: harness/prompts/workspace_agents.md
+          target: /workspace/AGENTS.md
+    docker:
+      flags:
+        - --cap-add=SYS_ADMIN
+        - --cap-add=SYS_CHROOT
+        - --cap-add=SETUID
+        - --cap-add=SETGID
+        - --cap-add=SYS_PTRACE
+        - --cap-add=NET_ADMIN
+        - --cap-add=NET_RAW
+        - --security-opt=seccomp=unconfined
+        - --security-opt=apparmor=unconfined
+    cli:
+      sandbox_mode: workspace-write
+      approval_policy: never
+      web_search: disabled
+      reasoning_effort: medium
+      model_supports_reasoning_summaries: true
+      allow_login_shell: false
+      workspace_write:
+        network_access: false
+      exec_flags:
+        - --strict-config
+        - --json
+        - --ephemeral
+        - --skip-git-repo-check
+    provider:
+      id: cliproxy_claude
+      name: CLIProxyAPI Claude Code
+      wire_api: responses
+      api_key_env: OPENAI_API_KEY
+      key_env: CLIPROXY_API_KEY
+      stream_idle_timeout_ms: 3000000
+      bridge:
+        image: ashmaize-cliproxy
+        dockerfile: container/cliproxy.Dockerfile
+        port: 8317
+        health_path: /healthz
+        base_path: /v1
+        config_template: container/cliproxy-config.yaml
+        config_target: /CLIProxyAPI/config.yaml
+        auth_home: .codex-eval/cliproxy-auth
+        auth_target: /root/.cli-proxy-api
