@@ -1,5 +1,7 @@
 # AshMaize Eval
 
+![AshMaize Eval scorecard leaderboard — per-model overall, section, pass, token, gen-time and cost breakdown](assets/scorecard_visualization.png)
+
 An RL **environment / eval** inspired by [GBA Eval](https://gbaeval.com)
 
 A frontier coding agent is given a written spec and must implement the **AshMaize** memory-hard proof-of-work VM from
