@@ -1,33 +1,6 @@
 {
-  "generated_at": "2026-07-01T08:18:10Z",
-  "harness": {
-    "attempt_policy": "single",
-    "codex_events": "transcripts/codex-gpt-5-4-mini-xhigh/codex-events.jsonl",
-    "codex_final_message": "transcripts/codex-gpt-5-4-mini-xhigh/codex-final.md",
-    "codex_inside_container": true,
-    "codex_model": "gpt-5.4-mini",
-    "codex_surface": "codex exec",
-    "generation_image": "ashmaize-eval-agent",
-    "grader_log": "transcripts/codex-gpt-5-4-mini-xhigh/grader.log",
-    "grading_image": "ashmaize-eval-grader",
-    "harness_id": "codex",
-    "harness_type": "codex",
-    "image": "ashmaize-eval-agent",
-    "model_label": "gpt-5.4-mini",
-    "note": "INTERRUPTED: codex exec was killed at a 1h wall-clock cap while still in its first turn (endless brute-force trying to match the non-power-of-two reference vector); it never emitted a final message. Score is the mid-flight /workspace/agent.sh snapshot, frozen and graded manually. No turn.completed event, so token usage is unavailable.",
-    "oracle_available_during_generation": false,
-    "reasoning_effort": "xhigh",
-    "run_dir": "runs/codex-gpt-5-4-mini-xhigh",
-    "slug": "codex-gpt-5-4-mini-xhigh",
-    "transcript_dir": "transcripts/codex-gpt-5-4-mini-xhigh"
-  },
-  "metrics": {
-    "generation_seconds": null,
-    "grading_seconds": 2.42,
-    "item_count": 103,
-    "turns": 0
-  },
-  "overall": 0.8048235294117647,
+  "generated_at": "2026-07-02T05:09:40Z",
+  "overall": 0.9972972972972973,
   "results": [
     {
       "id": "adversarial-0001-unknown-op",
@@ -40,8 +13,8 @@
       "id": "adversarial-0002-missing-preimage",
       "section": "adversarial",
       "weight": 1,
-      "pass": true,
-      "detail": "correctly rejected invalid input (exit 1)"
+      "pass": false,
+      "detail": "accepted input that should be rejected (exit 0, no error)"
     },
     {
       "id": "adversarial-0003-malformed-json",
@@ -201,8 +174,99 @@
       "id": "adversarial-0025-nb-instrs-overflow-u64",
       "section": "adversarial",
       "weight": 1,
-      "pass": false,
-      "detail": "candidate hung on invalid input (timeout)"
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0026-non-object-array",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0027-non-object-scalar",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0028-mod-zero-no-special1",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0029-rotl-shift-negative",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0030-hash-missing-rom-seed",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0031-hash-missing-rom-size",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0032-hash-missing-nb-loops",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0033-hash-missing-nb-instrs",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0034-rom-digest-missing-rom-seed",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0035-unit-missing-instr",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0036-unit-missing-a-hex",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0037-rotl-missing-shift",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "procedural-op-add-endianness",
+      "section": "procedural",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: out_hex"
     },
     {
       "id": "procedural-op-add-wrap",
@@ -220,6 +284,13 @@
     },
     {
       "id": "procedural-op-bitrev",
+      "section": "procedural",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: out_hex"
+    },
+    {
+      "id": "procedural-op-div-ignores-special1",
       "section": "procedural",
       "weight": 1,
       "pass": true,
@@ -296,6 +367,20 @@
       "detail": "match: out_hex"
     },
     {
+      "id": "procedural-op-isqrt-max",
+      "section": "procedural",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: out_hex"
+    },
+    {
+      "id": "procedural-op-isqrt-near-square",
+      "section": "procedural",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: out_hex"
+    },
+    {
       "id": "procedural-op-isqrt",
       "section": "procedural",
       "weight": 1,
@@ -318,6 +403,13 @@
     },
     {
       "id": "procedural-op-mul-low",
+      "section": "procedural",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: out_hex"
+    },
+    {
+      "id": "procedural-op-mulh-max",
       "section": "procedural",
       "weight": 1,
       "pass": true,
@@ -457,6 +549,20 @@
       "detail": "match: rom_digest_hex"
     },
     {
+      "id": "procedural-rom-0011-min-64",
+      "section": "procedural",
+      "weight": 2.5,
+      "pass": true,
+      "detail": "match: rom_digest_hex"
+    },
+    {
+      "id": "procedural-rom-0012-empty-seed",
+      "section": "procedural",
+      "weight": 2.5,
+      "pass": true,
+      "detail": "match: rom_digest_hex"
+    },
+    {
       "id": "replay-0001-min-loop",
       "section": "replay",
       "weight": 1,
@@ -544,46 +650,104 @@
       "id": "replay-0013-nonpow2-small",
       "section": "replay",
       "weight": 1,
-      "pass": false,
-      "detail": "mismatch on reg_digest_hex"
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
     },
     {
       "id": "replay-0014-nonpow2-mid",
       "section": "replay",
       "weight": 1,
-      "pass": false,
-      "detail": "mismatch on reg_digest_hex"
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
     },
     {
       "id": "replay-0015-nonpow2-prime257",
       "section": "replay",
       "weight": 1,
-      "pass": false,
-      "detail": "mismatch on reg_digest_hex"
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
     },
     {
       "id": "replay-0016-nonpow2-just-above-64k",
       "section": "replay",
       "weight": 1,
-      "pass": false,
-      "detail": "mismatch on reg_digest_hex"
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
     },
     {
       "id": "replay-0017-reference-10m-full",
       "section": "replay",
       "weight": 1,
-      "pass": false,
-      "detail": "mismatch on reg_digest_hex"
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+    },
+    {
+      "id": "replay-0018-empty-preimage",
+      "section": "replay",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+    },
+    {
+      "id": "replay-0019-min-rom-64",
+      "section": "replay",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+    },
+    {
+      "id": "replay-0020-empty-preimage-and-seed",
+      "section": "replay",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
     }
   ],
   "section_scores": {
-    "adversarial": 0.96,
+    "adversarial": 0.972972972972973,
     "procedural": 1,
-    "replay": 0.7058823529411765
+    "replay": 1
   },
   "section_weights": {
     "adversarial": 0.1,
     "procedural": 0.25,
     "replay": 0.65
+  },
+  "harness": {
+    "attempt_policy": "single",
+    "bridge_log": "transcripts/glm-5-2-medium/bridge.log",
+    "codex_events": "transcripts/glm-5-2-medium/codex-events.jsonl",
+    "codex_final_message": "transcripts/glm-5-2-medium/codex-final.md",
+    "codex_inside_container": true,
+    "codex_model": "glm-5.2",
+    "codex_surface": "codex exec",
+    "generation_image": "ashmaize-eval-agent",
+    "grader_log": "transcripts/glm-5-2-medium/grader.log",
+    "grading_image": "ashmaize-eval-grader",
+    "harness_id": "glm",
+    "harness_type": "codex",
+    "image": "ashmaize-eval-agent",
+    "model_label": "glm-5.2",
+    "model_provider": "zai_proxy",
+    "oracle_available_during_generation": false,
+    "provider_bridge_health_path": "/health",
+    "provider_bridge_image": "ashmaize-zai-bridge",
+    "provider_upstream_base_url": "https://api.z.ai/api/coding/paas/v4",
+    "provider_wire_api": "responses",
+    "reasoning_effort": "medium",
+    "run_dir": "runs/glm-5-2-medium",
+    "slug": "glm-5-2-medium",
+    "transcript_dir": "transcripts/glm-5-2-medium"
+  },
+  "metrics": {
+    "cached_input_tokens": 0,
+    "generation_seconds": 2545.69,
+    "grading_seconds": 6.35,
+    "input_tokens": 4338468,
+    "item_count": 194,
+    "output_tokens": 171663,
+    "reasoning_tokens": 0,
+    "total_tokens": 4510131,
+    "turns": 1
   }
 }

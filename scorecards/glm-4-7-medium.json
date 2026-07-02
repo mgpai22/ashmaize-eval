@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-02T05:08:53Z",
-  "overall": 1,
+  "generated_at": "2026-07-02T05:09:27Z",
+  "overall": 0.12192982456140351,
   "results": [
     {
       "id": "adversarial-0001-unknown-op",
@@ -265,43 +265,43 @@
       "id": "procedural-op-add-endianness",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-add-wrap",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-and",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-bitrev",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-div-ignores-special1",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-div-zero",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-div",
@@ -314,78 +314,78 @@
       "id": "procedural-op-hash0",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash1",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash2",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash3",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash4",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash5",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash6",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash7",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-isqrt-max",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-isqrt-near-square",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-isqrt",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-mod-division-quirk",
@@ -398,15 +398,15 @@
       "id": "procedural-op-mod-zero",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-mul-low",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-mulh-max",
@@ -419,8 +419,8 @@
       "id": "procedural-op-mulh",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-neg",
@@ -433,43 +433,43 @@
       "id": "procedural-op-rotl-0",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-rotl-1",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-rotl-31",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-rotr-0",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-rotr-1",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-rotr-31",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-xor",
@@ -482,231 +482,231 @@
       "id": "procedural-rom-0001-zero-4k",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0002-ref-64k",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0003-dead-262k",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0004-ref-vector-10m",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0005-a1-64k",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0006-ff-4k",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0007-ascii-262k",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0008-long-64k",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0009-nonpow2-65chunks",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0010-prime257",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0011-min-64",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "procedural-rom-0012-empty-seed",
       "section": "procedural",
       "weight": 2.5,
-      "pass": true,
-      "detail": "match: rom_digest_hex"
+      "pass": false,
+      "detail": "mismatch on rom_digest_hex"
     },
     {
       "id": "replay-0001-min-loop",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0002-hello-64k",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0003-alt-instr",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0004-zero-seed-262k",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0005-pattern-aa",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0006-pattern-55",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0007-single-byte-high",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0008-ascii",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0009-counter",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0010-prime-bytes",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0011-short-zero",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0012-reference-small",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0013-nonpow2-small",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0014-nonpow2-mid",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0015-nonpow2-prime257",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0016-nonpow2-just-above-64k",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0017-reference-10m-full",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0018-empty-preimage",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0019-min-rom-64",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     },
     {
       "id": "replay-0020-empty-preimage-and-seed",
       "section": "replay",
       "weight": 1,
-      "pass": true,
-      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+      "pass": false,
+      "detail": "candidate rejected valid input (exit 1)"
     }
   ],
   "section_scores": {
     "adversarial": 1,
-    "procedural": 1,
-    "replay": 1
+    "procedural": 0.08771929824561403,
+    "replay": 0
   },
   "section_weights": {
     "adversarial": 0.1,
@@ -715,38 +715,39 @@
   },
   "harness": {
     "attempt_policy": "single",
-    "bridge_log": "transcripts/claude-sonnet-5-medium/bridge.log",
-    "codex_events": "transcripts/claude-sonnet-5-medium/codex-events.jsonl",
-    "codex_final_message": "transcripts/claude-sonnet-5-medium/codex-final.md",
+    "bridge_log": "transcripts/glm-4-7-medium/bridge.log",
+    "codex_events": "transcripts/glm-4-7-medium/codex-events.jsonl",
+    "codex_final_message": "transcripts/glm-4-7-medium/codex-final.md",
     "codex_inside_container": true,
-    "codex_model": "claude-sonnet-5",
+    "codex_model": "glm-4.7",
     "codex_surface": "codex exec",
     "generation_image": "ashmaize-eval-agent",
-    "grader_log": "transcripts/claude-sonnet-5-medium/grader.log",
+    "grader_log": "transcripts/glm-4-7-medium/grader.log",
     "grading_image": "ashmaize-eval-grader",
-    "harness_id": "claude-sonnet-5",
+    "harness_id": "glm",
     "harness_type": "codex",
     "image": "ashmaize-eval-agent",
-    "model_label": "claude-sonnet-5",
-    "model_provider": "cliproxy_claude",
+    "model_label": "glm-4.7",
+    "model_provider": "zai_proxy",
     "oracle_available_during_generation": false,
-    "provider_bridge_health_path": "/healthz",
-    "provider_bridge_image": "ashmaize-cliproxy",
+    "provider_bridge_health_path": "/health",
+    "provider_bridge_image": "ashmaize-zai-bridge",
+    "provider_upstream_base_url": "https://api.z.ai/api/coding/paas/v4",
     "provider_wire_api": "responses",
     "reasoning_effort": "medium",
-    "run_dir": "runs/claude-sonnet-5-medium",
-    "slug": "claude-sonnet-5-medium",
-    "transcript_dir": "transcripts/claude-sonnet-5-medium"
+    "run_dir": "runs/glm-4-7-medium",
+    "slug": "glm-4-7-medium",
+    "transcript_dir": "transcripts/glm-4-7-medium"
   },
   "metrics": {
-    "cached_input_tokens": 725499,
-    "generation_seconds": 240.73,
-    "grading_seconds": 3.21,
-    "input_tokens": 823498,
-    "item_count": 24,
-    "output_tokens": 24545,
+    "cached_input_tokens": 0,
+    "generation_seconds": 664.39,
+    "grading_seconds": 10.57,
+    "input_tokens": 174242,
+    "item_count": 18,
+    "output_tokens": 37929,
     "reasoning_tokens": 0,
-    "total_tokens": 848043,
+    "total_tokens": 212171,
     "turns": 1
   }
 }

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-02T05:08:53Z",
-  "overall": 1,
+  "generated_at": "2026-07-02T05:09:02Z",
+  "overall": 0.9078947368421052,
   "results": [
     {
       "id": "adversarial-0001-unknown-op",
@@ -265,43 +265,43 @@
       "id": "procedural-op-add-endianness",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-add-wrap",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-and",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-bitrev",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-div-ignores-special1",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-div-zero",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-div",
@@ -314,57 +314,57 @@
       "id": "procedural-op-hash0",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash1",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash2",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash3",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash4",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash5",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash6",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-hash7",
       "section": "procedural",
       "weight": 0.5,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-isqrt-max",
@@ -377,15 +377,15 @@
       "id": "procedural-op-isqrt-near-square",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-isqrt",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-mod-division-quirk",
@@ -398,15 +398,15 @@
       "id": "procedural-op-mod-zero",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-mul-low",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-mulh-max",
@@ -419,8 +419,8 @@
       "id": "procedural-op-mulh",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-neg",
@@ -433,43 +433,43 @@
       "id": "procedural-op-rotl-0",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-rotl-1",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-rotl-31",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-rotr-0",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-rotr-1",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-rotr-31",
       "section": "procedural",
       "weight": 1,
-      "pass": true,
-      "detail": "match: out_hex"
+      "pass": false,
+      "detail": "mismatch on out_hex"
     },
     {
       "id": "procedural-op-xor",
@@ -705,7 +705,7 @@
   ],
   "section_scores": {
     "adversarial": 1,
-    "procedural": 1,
+    "procedural": 0.631578947368421,
     "replay": 1
   },
   "section_weights": {
@@ -715,38 +715,33 @@
   },
   "harness": {
     "attempt_policy": "single",
-    "bridge_log": "transcripts/claude-sonnet-5-medium/bridge.log",
-    "codex_events": "transcripts/claude-sonnet-5-medium/codex-events.jsonl",
-    "codex_final_message": "transcripts/claude-sonnet-5-medium/codex-final.md",
+    "codex_events": "transcripts/codex-gpt-5-4-mini-low/codex-events.jsonl",
+    "codex_final_message": "transcripts/codex-gpt-5-4-mini-low/codex-final.md",
     "codex_inside_container": true,
-    "codex_model": "claude-sonnet-5",
+    "codex_model": "gpt-5.4-mini",
     "codex_surface": "codex exec",
     "generation_image": "ashmaize-eval-agent",
-    "grader_log": "transcripts/claude-sonnet-5-medium/grader.log",
+    "grader_log": "transcripts/codex-gpt-5-4-mini-low/grader.log",
     "grading_image": "ashmaize-eval-grader",
-    "harness_id": "claude-sonnet-5",
+    "harness_id": "codex",
     "harness_type": "codex",
     "image": "ashmaize-eval-agent",
-    "model_label": "claude-sonnet-5",
-    "model_provider": "cliproxy_claude",
+    "model_label": "gpt-5.4-mini",
     "oracle_available_during_generation": false,
-    "provider_bridge_health_path": "/healthz",
-    "provider_bridge_image": "ashmaize-cliproxy",
-    "provider_wire_api": "responses",
-    "reasoning_effort": "medium",
-    "run_dir": "runs/claude-sonnet-5-medium",
-    "slug": "claude-sonnet-5-medium",
-    "transcript_dir": "transcripts/claude-sonnet-5-medium"
+    "reasoning_effort": "low",
+    "run_dir": "runs/codex-gpt-5-4-mini-low",
+    "slug": "codex-gpt-5-4-mini-low",
+    "transcript_dir": "transcripts/codex-gpt-5-4-mini-low"
   },
   "metrics": {
-    "cached_input_tokens": 725499,
-    "generation_seconds": 240.73,
-    "grading_seconds": 3.21,
-    "input_tokens": 823498,
-    "item_count": 24,
-    "output_tokens": 24545,
-    "reasoning_tokens": 0,
-    "total_tokens": 848043,
+    "cached_input_tokens": 161280,
+    "generation_seconds": 101.14,
+    "grading_seconds": 6.45,
+    "input_tokens": 187915,
+    "item_count": 22,
+    "output_tokens": 6182,
+    "reasoning_tokens": 865,
+    "total_tokens": 194097,
     "turns": 1
   }
 }

@@ -12,6 +12,10 @@ oracle/oracle
 /.codex-eval/
 /FAILURES.md
 
+# Secrets (never commit)
+/cerebras.txt
+*.key
+
 # Misc
 *.wasm
 __pycache__/

@@ -1,37 +1,6 @@
 {
-  "generated_at": "2026-07-01T08:17:07Z",
-  "harness": {
-    "attempt_policy": "single",
-    "codex_events": "transcripts/codex-gpt-5-5-xhigh/codex-events.jsonl",
-    "codex_final_message": "transcripts/codex-gpt-5-5-xhigh/codex-final.md",
-    "codex_inside_container": true,
-    "codex_model": "gpt-5.5",
-    "codex_surface": "codex exec",
-    "generation_image": "ashmaize-eval-agent",
-    "grader_log": "transcripts/codex-gpt-5-5-xhigh/grader.log",
-    "grading_image": "ashmaize-eval-grader",
-    "harness_id": "codex",
-    "harness_type": "codex",
-    "image": "ashmaize-eval-agent",
-    "model_label": "gpt-5.5",
-    "oracle_available_during_generation": false,
-    "reasoning_effort": "xhigh",
-    "run_dir": "runs/codex-gpt-5-5-xhigh",
-    "slug": "codex-gpt-5-5-xhigh",
-    "transcript_dir": "transcripts/codex-gpt-5-5-xhigh"
-  },
-  "metrics": {
-    "cached_input_tokens": 5958656,
-    "generation_seconds": null,
-    "grading_seconds": 4.34,
-    "input_tokens": 6109764,
-    "item_count": 166,
-    "output_tokens": 72165,
-    "reasoning_tokens": 25456,
-    "total_tokens": 6181929,
-    "turns": 1
-  },
-  "overall": 0.8088235294117647,
+  "generated_at": "2026-07-02T05:09:06Z",
+  "overall": 1,
   "results": [
     {
       "id": "adversarial-0001-unknown-op",
@@ -209,6 +178,97 @@
       "detail": "correctly rejected invalid input (exit 1)"
     },
     {
+      "id": "adversarial-0026-non-object-array",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0027-non-object-scalar",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0028-mod-zero-no-special1",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0029-rotl-shift-negative",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0030-hash-missing-rom-seed",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0031-hash-missing-rom-size",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0032-hash-missing-nb-loops",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0033-hash-missing-nb-instrs",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0034-rom-digest-missing-rom-seed",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0035-unit-missing-instr",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0036-unit-missing-a-hex",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "adversarial-0037-rotl-missing-shift",
+      "section": "adversarial",
+      "weight": 1,
+      "pass": true,
+      "detail": "correctly rejected invalid input (exit 1)"
+    },
+    {
+      "id": "procedural-op-add-endianness",
+      "section": "procedural",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: out_hex"
+    },
+    {
       "id": "procedural-op-add-wrap",
       "section": "procedural",
       "weight": 1,
@@ -224,6 +284,13 @@
     },
     {
       "id": "procedural-op-bitrev",
+      "section": "procedural",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: out_hex"
+    },
+    {
+      "id": "procedural-op-div-ignores-special1",
       "section": "procedural",
       "weight": 1,
       "pass": true,
@@ -300,6 +367,20 @@
       "detail": "match: out_hex"
     },
     {
+      "id": "procedural-op-isqrt-max",
+      "section": "procedural",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: out_hex"
+    },
+    {
+      "id": "procedural-op-isqrt-near-square",
+      "section": "procedural",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: out_hex"
+    },
+    {
       "id": "procedural-op-isqrt",
       "section": "procedural",
       "weight": 1,
@@ -322,6 +403,13 @@
     },
     {
       "id": "procedural-op-mul-low",
+      "section": "procedural",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: out_hex"
+    },
+    {
+      "id": "procedural-op-mulh-max",
       "section": "procedural",
       "weight": 1,
       "pass": true,
@@ -461,6 +549,20 @@
       "detail": "match: rom_digest_hex"
     },
     {
+      "id": "procedural-rom-0011-min-64",
+      "section": "procedural",
+      "weight": 2.5,
+      "pass": true,
+      "detail": "match: rom_digest_hex"
+    },
+    {
+      "id": "procedural-rom-0012-empty-seed",
+      "section": "procedural",
+      "weight": 2.5,
+      "pass": true,
+      "detail": "match: rom_digest_hex"
+    },
+    {
       "id": "replay-0001-min-loop",
       "section": "replay",
       "weight": 1,
@@ -548,46 +650,98 @@
       "id": "replay-0013-nonpow2-small",
       "section": "replay",
       "weight": 1,
-      "pass": false,
-      "detail": "mismatch on reg_digest_hex"
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
     },
     {
       "id": "replay-0014-nonpow2-mid",
       "section": "replay",
       "weight": 1,
-      "pass": false,
-      "detail": "mismatch on reg_digest_hex"
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
     },
     {
       "id": "replay-0015-nonpow2-prime257",
       "section": "replay",
       "weight": 1,
-      "pass": false,
-      "detail": "mismatch on reg_digest_hex"
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
     },
     {
       "id": "replay-0016-nonpow2-just-above-64k",
       "section": "replay",
       "weight": 1,
-      "pass": false,
-      "detail": "mismatch on reg_digest_hex"
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
     },
     {
       "id": "replay-0017-reference-10m-full",
       "section": "replay",
       "weight": 1,
-      "pass": false,
-      "detail": "mismatch on reg_digest_hex"
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+    },
+    {
+      "id": "replay-0018-empty-preimage",
+      "section": "replay",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+    },
+    {
+      "id": "replay-0019-min-rom-64",
+      "section": "replay",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
+    },
+    {
+      "id": "replay-0020-empty-preimage-and-seed",
+      "section": "replay",
+      "weight": 1,
+      "pass": true,
+      "detail": "match: rom_digest_hex,reg_digest_hex,hash_hex"
     }
   ],
   "section_scores": {
     "adversarial": 1,
     "procedural": 1,
-    "replay": 0.7058823529411765
+    "replay": 1
   },
   "section_weights": {
     "adversarial": 0.1,
     "procedural": 0.25,
     "replay": 0.65
+  },
+  "harness": {
+    "attempt_policy": "single",
+    "codex_events": "transcripts/codex-gpt-5-5-xhigh/codex-events.jsonl",
+    "codex_final_message": "transcripts/codex-gpt-5-5-xhigh/codex-final.md",
+    "codex_inside_container": true,
+    "codex_model": "gpt-5.5",
+    "codex_surface": "codex exec",
+    "generation_image": "ashmaize-eval-agent",
+    "grader_log": "transcripts/codex-gpt-5-5-xhigh/grader.log",
+    "grading_image": "ashmaize-eval-grader",
+    "harness_id": "codex",
+    "harness_type": "codex",
+    "image": "ashmaize-eval-agent",
+    "model_label": "gpt-5.5",
+    "oracle_available_during_generation": false,
+    "reasoning_effort": "xhigh",
+    "run_dir": "runs/codex-gpt-5-5-xhigh",
+    "slug": "codex-gpt-5-5-xhigh",
+    "transcript_dir": "transcripts/codex-gpt-5-5-xhigh"
+  },
+  "metrics": {
+    "cached_input_tokens": 519680,
+    "generation_seconds": 312.82,
+    "grading_seconds": 3.59,
+    "input_tokens": 565964,
+    "item_count": 41,
+    "output_tokens": 15835,
+    "reasoning_tokens": 8082,
+    "total_tokens": 581799,
+    "turns": 1
   }
 }

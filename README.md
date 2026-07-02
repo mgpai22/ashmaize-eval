@@ -26,7 +26,7 @@ scratch. A deterministic grader runs a fixed corpus of inputs through the agent'
 spec/        ASHMAIZE.md (the algorithm) · ABI.md (the JSON-over-stdio interface) · TASK.md (agent prompt)
 oracle/      reference oracle: src/main.rs (ABI wrapper) + vendor/ce-ashmaize (pinned upstream fork)
 grader/      Go grader: runs candidate vs oracle over the corpus, exact-match, weighted score
-scenarios/   replay/ procedural/ adversarial/ — the 73-case graded corpus (JSON)
+scenarios/   replay/ procedural/ adversarial/ — the 100-case graded corpus (JSON)
 examples/    mock_impl.py — a PLACEHOLDER impl (validates the ABI, fake outputs) to smoke-test wiring
 container/   offline Dockerfile (no network) + check_offline.sh (affordance verification)
 harness/     Go Codex runner + auth helpers; root config.yaml selects harness settings

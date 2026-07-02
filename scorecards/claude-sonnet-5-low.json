@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T05:08:53Z",
+  "generated_at": "2026-07-02T05:08:48Z",
   "overall": 1,
   "results": [
     {
@@ -715,14 +715,14 @@
   },
   "harness": {
     "attempt_policy": "single",
-    "bridge_log": "transcripts/claude-sonnet-5-medium/bridge.log",
-    "codex_events": "transcripts/claude-sonnet-5-medium/codex-events.jsonl",
-    "codex_final_message": "transcripts/claude-sonnet-5-medium/codex-final.md",
+    "bridge_log": "transcripts/claude-sonnet-5-low/bridge.log",
+    "codex_events": "transcripts/claude-sonnet-5-low/codex-events.jsonl",
+    "codex_final_message": "transcripts/claude-sonnet-5-low/codex-final.md",
     "codex_inside_container": true,
     "codex_model": "claude-sonnet-5",
     "codex_surface": "codex exec",
     "generation_image": "ashmaize-eval-agent",
-    "grader_log": "transcripts/claude-sonnet-5-medium/grader.log",
+    "grader_log": "transcripts/claude-sonnet-5-low/grader.log",
     "grading_image": "ashmaize-eval-grader",
     "harness_id": "claude-sonnet-5",
     "harness_type": "codex",
@@ -733,20 +733,20 @@
     "provider_bridge_health_path": "/healthz",
     "provider_bridge_image": "ashmaize-cliproxy",
     "provider_wire_api": "responses",
-    "reasoning_effort": "medium",
-    "run_dir": "runs/claude-sonnet-5-medium",
-    "slug": "claude-sonnet-5-medium",
-    "transcript_dir": "transcripts/claude-sonnet-5-medium"
+    "reasoning_effort": "low",
+    "run_dir": "runs/claude-sonnet-5-low",
+    "slug": "claude-sonnet-5-low",
+    "transcript_dir": "transcripts/claude-sonnet-5-low"
   },
   "metrics": {
-    "cached_input_tokens": 725499,
-    "generation_seconds": 240.73,
-    "grading_seconds": 3.21,
-    "input_tokens": 823498,
-    "item_count": 24,
-    "output_tokens": 24545,
+    "cached_input_tokens": 2006778,
+    "generation_seconds": 362.33,
+    "grading_seconds": 0.62,
+    "input_tokens": 2138000,
+    "item_count": 55,
+    "output_tokens": 37991,
     "reasoning_tokens": 0,
-    "total_tokens": 848043,
+    "total_tokens": 2175991,
     "turns": 1
   }
 }

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T05:08:53Z",
+  "generated_at": "2026-07-02T05:09:11Z",
   "overall": 1,
   "results": [
     {
@@ -715,38 +715,38 @@
   },
   "harness": {
     "attempt_policy": "single",
-    "bridge_log": "transcripts/claude-sonnet-5-medium/bridge.log",
-    "codex_events": "transcripts/claude-sonnet-5-medium/codex-events.jsonl",
-    "codex_final_message": "transcripts/claude-sonnet-5-medium/codex-final.md",
+    "bridge_log": "transcripts/gemini-3-5-flash-low/bridge.log",
+    "codex_events": "transcripts/gemini-3-5-flash-low/codex-events.jsonl",
+    "codex_final_message": "transcripts/gemini-3-5-flash-low/codex-final.md",
     "codex_inside_container": true,
-    "codex_model": "claude-sonnet-5",
+    "codex_model": "gemini-3.5-flash-low",
     "codex_surface": "codex exec",
     "generation_image": "ashmaize-eval-agent",
-    "grader_log": "transcripts/claude-sonnet-5-medium/grader.log",
+    "grader_log": "transcripts/gemini-3-5-flash-low/grader.log",
     "grading_image": "ashmaize-eval-grader",
     "harness_id": "claude-sonnet-5",
     "harness_type": "codex",
     "image": "ashmaize-eval-agent",
-    "model_label": "claude-sonnet-5",
+    "model_label": "gemini-3.5-flash-low",
     "model_provider": "cliproxy_claude",
     "oracle_available_during_generation": false,
     "provider_bridge_health_path": "/healthz",
     "provider_bridge_image": "ashmaize-cliproxy",
     "provider_wire_api": "responses",
     "reasoning_effort": "medium",
-    "run_dir": "runs/claude-sonnet-5-medium",
-    "slug": "claude-sonnet-5-medium",
-    "transcript_dir": "transcripts/claude-sonnet-5-medium"
+    "run_dir": "runs/gemini-3-5-flash-low",
+    "slug": "gemini-3-5-flash-low",
+    "transcript_dir": "transcripts/gemini-3-5-flash-low"
   },
   "metrics": {
-    "cached_input_tokens": 725499,
-    "generation_seconds": 240.73,
-    "grading_seconds": 3.21,
-    "input_tokens": 823498,
-    "item_count": 24,
-    "output_tokens": 24545,
-    "reasoning_tokens": 0,
-    "total_tokens": 848043,
+    "cached_input_tokens": 2694597,
+    "generation_seconds": 212.74,
+    "grading_seconds": 4.13,
+    "input_tokens": 2967058,
+    "item_count": 102,
+    "output_tokens": 63240,
+    "reasoning_tokens": 292,
+    "total_tokens": 3030298,
     "turns": 1
   }
 }
