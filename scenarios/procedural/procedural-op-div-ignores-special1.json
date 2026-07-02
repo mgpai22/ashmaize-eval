@@ -1,0 +1,15 @@
+{
+  "id": "procedural-op-div-ignores-special1",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Div",
+    "a_hex": "0000000000001234",
+    "b_hex": "0000000000000010",
+    "special1_hex": "deadbeefdeadbeef"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

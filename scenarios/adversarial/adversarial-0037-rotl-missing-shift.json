@@ -1,0 +1,11 @@
+{
+  "id": "adversarial-0037-rotl-missing-shift",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "RotL",
+    "a_hex": "0123456789abcdef"
+  },
+  "expect_error": true
+}

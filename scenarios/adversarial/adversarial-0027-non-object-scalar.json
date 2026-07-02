@@ -1,0 +1,7 @@
+{
+  "id": "adversarial-0027-non-object-scalar",
+  "section": "adversarial",
+  "weight": 1.0,
+  "raw_request": "42",
+  "expect_error": true
+}

@@ -1,0 +1,7 @@
+{
+  "id": "adversarial-0026-non-object-array",
+  "section": "adversarial",
+  "weight": 1.0,
+  "raw_request": "[1,2,3]",
+  "expect_error": true
+}

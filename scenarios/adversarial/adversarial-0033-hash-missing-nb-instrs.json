@@ -1,0 +1,13 @@
+{
+  "id": "adversarial-0033-hash-missing-nb-instrs",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "00",
+    "rom_seed_hex": "00",
+    "rom_size": 4096,
+    "nb_loops": 2
+  },
+  "expect_error": true
+}

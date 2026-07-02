@@ -1,0 +1,14 @@
+{
+  "id": "procedural-op-add-endianness",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Add",
+    "a_hex": "6ec5c07ff6908e53",
+    "b_hex": "115ac6cb3c58fd84"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

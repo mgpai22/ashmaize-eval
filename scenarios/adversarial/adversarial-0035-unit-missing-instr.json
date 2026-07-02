@@ -1,0 +1,11 @@
+{
+  "id": "adversarial-0035-unit-missing-instr",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "a_hex": "0000000000000001",
+    "b_hex": "0000000000000002"
+  },
+  "expect_error": true
+}

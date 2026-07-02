@@ -1,0 +1,18 @@
+{
+  "id": "replay-0019-min-rom-64",
+  "section": "replay",
+  "weight": 1.0,
+  "request": {
+    "op": "hash",
+    "preimage_hex": "6d696e",
+    "rom_seed_hex": "6d696e2d726f6d",
+    "rom_size": 64,
+    "nb_loops": 2,
+    "nb_instrs": 256
+  },
+  "compare": [
+    "rom_digest_hex",
+    "reg_digest_hex",
+    "hash_hex"
+  ]
+}

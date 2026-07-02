@@ -1,0 +1,13 @@
+{
+  "id": "procedural-op-isqrt-near-square",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "ISqrt",
+    "a_hex": "fffffffe00000000"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

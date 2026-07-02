@@ -1,0 +1,10 @@
+{
+  "id": "adversarial-0034-rom-digest-missing-rom-seed",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "rom_digest",
+    "rom_size": 4096
+  },
+  "expect_error": true
+}

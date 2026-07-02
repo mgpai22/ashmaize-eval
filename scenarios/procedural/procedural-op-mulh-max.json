@@ -1,0 +1,14 @@
+{
+  "id": "procedural-op-mulh-max",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "MulH",
+    "a_hex": "ffffffffffffffff",
+    "b_hex": "ffffffffffffffff"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}

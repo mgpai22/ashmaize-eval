@@ -1,0 +1,12 @@
+{
+  "id": "adversarial-0029-rotl-shift-negative",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "RotL",
+    "a_hex": "0000000000000001",
+    "shift": -1
+  },
+  "expect_error": true
+}

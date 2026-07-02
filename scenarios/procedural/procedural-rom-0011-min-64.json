@@ -1,0 +1,13 @@
+{
+  "id": "procedural-rom-0011-min-64",
+  "section": "procedural",
+  "weight": 2.5,
+  "request": {
+    "op": "rom_digest",
+    "rom_seed_hex": "6d696e2d726f6d",
+    "rom_size": 64
+  },
+  "compare": [
+    "rom_digest_hex"
+  ]
+}

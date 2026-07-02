@@ -1,0 +1,10 @@
+{
+  "id": "adversarial-0036-unit-missing-a-hex",
+  "section": "adversarial",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "Neg"
+  },
+  "expect_error": true
+}

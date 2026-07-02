@@ -1,0 +1,13 @@
+{
+  "id": "procedural-op-isqrt-max",
+  "section": "procedural",
+  "weight": 1.0,
+  "request": {
+    "op": "unit",
+    "instr": "ISqrt",
+    "a_hex": "ffffffffffffffff"
+  },
+  "compare": [
+    "out_hex"
+  ]
+}
