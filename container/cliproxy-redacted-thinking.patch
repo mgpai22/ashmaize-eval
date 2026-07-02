@@ -1,0 +1,138 @@
+diff --git a/internal/translator/claude/openai/responses/claude_openai-responses_request.go b/internal/translator/claude/openai/responses/claude_openai-responses_request.go
+index 0599f99..b5d9914 100644
+--- a/internal/translator/claude/openai/responses/claude_openai-responses_request.go
++++ b/internal/translator/claude/openai/responses/claude_openai-responses_request.go
+@@ -477,12 +477,28 @@ func ConvertOpenAIResponsesRequestToClaude(modelName string, inputRawJSON []byte
+ 	return out
+ }
+ 
++// redactedThinkingContentPrefix tags the encrypted_content of a Responses
++// reasoning item that actually carries a Claude redacted_thinking `data` blob,
++// so the request path can round-trip it back to Claude verbatim without
++// mistaking foreign (non-Claude) reasoning signatures for redacted thinking.
++const redactedThinkingContentPrefix = "__redacted_thinking__:"
++
+ func convertResponsesReasoningToClaudeThinking(item gjson.Result) []byte {
+-	signature, ok := sigcompat.CompatibleSignatureForProvider(sigcompat.SignatureProviderClaude, item.Get("encrypted_content").String())
++	encryptedContent := item.Get("encrypted_content").String()
++
++	// A redacted_thinking block we previously forwarded: reconstruct it verbatim.
++	// Anthropic requires such blocks to be echoed back unchanged on later turns.
++	if strings.HasPrefix(encryptedContent, redactedThinkingContentPrefix) {
++		data := strings.TrimPrefix(encryptedContent, redactedThinkingContentPrefix)
++		redactedPart := []byte(`{"type":"redacted_thinking","data":""}`)
++		redactedPart, _ = sjson.SetBytes(redactedPart, "data", data)
++		return redactedPart
++	}
++
++	signature, ok := sigcompat.CompatibleSignatureForProvider(sigcompat.SignatureProviderClaude, encryptedContent)
+ 	if !ok {
+ 		return nil
+ 	}
+-
+ 	thinkingText := responsesReasoningSummaryText(item)
+ 	thinkingPart := []byte(`{"type":"thinking","thinking":"","signature":""}`)
+ 	thinkingPart, _ = sjson.SetBytes(thinkingPart, "thinking", thinkingText)
+diff --git a/internal/translator/claude/openai/responses/claude_openai-responses_response.go b/internal/translator/claude/openai/responses/claude_openai-responses_response.go
+index c27cb4b..9d11987 100644
+--- a/internal/translator/claude/openai/responses/claude_openai-responses_response.go
++++ b/internal/translator/claude/openai/responses/claude_openai-responses_response.go
+@@ -32,12 +32,13 @@ type claudeToResponsesState struct {
+ 	CurrentTextBuf     strings.Builder
+ 	MessageAnnotations []any
+ 	// reasoning state
+-	ReasoningActive    bool
+-	ReasoningItemID    string
+-	ReasoningBuf       strings.Builder
+-	ReasoningSignature string
+-	ReasoningPartAdded bool
+-	ReasoningIndex     int
++	ReasoningActive     bool
++	ReasoningItemID     string
++	ReasoningBuf        strings.Builder
++	ReasoningSignature  string
++	ReasoningPartAdded  bool
++	ReasoningIndex      int
++	ReasoningIsRedacted bool
+ 	// usage aggregation
+ 	Usage claudeResponsesUsageTokens
+ }
+@@ -190,6 +191,7 @@ func ConvertClaudeResponseToOpenAIResponses(ctx context.Context, modelName strin
+ 			st.MessageAnnotations = nil
+ 			st.ReasoningBuf.Reset()
+ 			st.ReasoningActive = false
++			st.ReasoningIsRedacted = false
+ 			st.InTextBlock = false
+ 			st.InFuncBlock = false
+ 			st.MessageOpen = false
+@@ -284,6 +286,22 @@ func ConvertClaudeResponseToOpenAIResponses(ctx context.Context, modelName strin
+ 			part, _ = sjson.SetBytes(part, "output_index", idx)
+ 			out = append(out, emitEvent("response.reasoning_summary_part.added", part))
+ 			st.ReasoningPartAdded = true
++		} else if typ == "redacted_thinking" {
++			// Redacted thinking: Anthropic returns an opaque `data` blob that must be
++			// echoed back verbatim on later turns. Forward it as a reasoning item's
++			// encrypted_content so the request path can reconstruct the block.
++			st.ReasoningActive = true
++			st.ReasoningIsRedacted = true
++			st.ReasoningIndex = idx
++			st.ReasoningBuf.Reset()
++			st.ReasoningSignature = redactedThinkingContentPrefix + cb.Get("data").String()
++			st.ReasoningItemID = fmt.Sprintf("rs_%s_%d", st.ResponseID, idx)
++			item := []byte(`{"type":"response.output_item.added","sequence_number":0,"output_index":0,"item":{"id":"","type":"reasoning","status":"in_progress","encrypted_content":"","summary":[]}}`)
++			item, _ = sjson.SetBytes(item, "sequence_number", nextSeq())
++			item, _ = sjson.SetBytes(item, "output_index", idx)
++			item, _ = sjson.SetBytes(item, "item.id", st.ReasoningItemID)
++			item, _ = sjson.SetBytes(item, "item.encrypted_content", st.ReasoningSignature)
++			out = append(out, emitEvent("response.output_item.added", item))
+ 		}
+ 	case "content_block_delta":
+ 		d := root.Get("delta")
+@@ -372,24 +390,26 @@ func ConvertClaudeResponseToOpenAIResponses(ctx context.Context, modelName strin
+ 			st.InFuncBlock = false
+ 		} else if st.ReasoningActive {
+ 			full := st.ReasoningBuf.String()
+-			textDone := []byte(`{"type":"response.reasoning_summary_text.done","sequence_number":0,"item_id":"","output_index":0,"summary_index":0,"text":""}`)
+-			textDone, _ = sjson.SetBytes(textDone, "sequence_number", nextSeq())
+-			textDone, _ = sjson.SetBytes(textDone, "item_id", st.ReasoningItemID)
+-			textDone, _ = sjson.SetBytes(textDone, "output_index", st.ReasoningIndex)
+-			textDone, _ = sjson.SetBytes(textDone, "text", full)
+-			out = append(out, emitEvent("response.reasoning_summary_text.done", textDone))
+-			partDone := []byte(`{"type":"response.reasoning_summary_part.done","sequence_number":0,"item_id":"","output_index":0,"summary_index":0,"part":{"type":"summary_text","text":""}}`)
+-			partDone, _ = sjson.SetBytes(partDone, "sequence_number", nextSeq())
+-			partDone, _ = sjson.SetBytes(partDone, "item_id", st.ReasoningItemID)
+-			partDone, _ = sjson.SetBytes(partDone, "output_index", st.ReasoningIndex)
+-			partDone, _ = sjson.SetBytes(partDone, "part.text", full)
+-			out = append(out, emitEvent("response.reasoning_summary_part.done", partDone))
++			if !st.ReasoningIsRedacted {
++				textDone := []byte(`{"type":"response.reasoning_summary_text.done","sequence_number":0,"item_id":"","output_index":0,"summary_index":0,"text":""}`)
++				textDone, _ = sjson.SetBytes(textDone, "sequence_number", nextSeq())
++				textDone, _ = sjson.SetBytes(textDone, "item_id", st.ReasoningItemID)
++				textDone, _ = sjson.SetBytes(textDone, "output_index", st.ReasoningIndex)
++				textDone, _ = sjson.SetBytes(textDone, "text", full)
++				out = append(out, emitEvent("response.reasoning_summary_text.done", textDone))
++				partDone := []byte(`{"type":"response.reasoning_summary_part.done","sequence_number":0,"item_id":"","output_index":0,"summary_index":0,"part":{"type":"summary_text","text":""}}`)
++				partDone, _ = sjson.SetBytes(partDone, "sequence_number", nextSeq())
++				partDone, _ = sjson.SetBytes(partDone, "item_id", st.ReasoningItemID)
++				partDone, _ = sjson.SetBytes(partDone, "output_index", st.ReasoningIndex)
++				partDone, _ = sjson.SetBytes(partDone, "part.text", full)
++				out = append(out, emitEvent("response.reasoning_summary_part.done", partDone))
++			}
+ 			itemDone := []byte(`{"type":"response.output_item.done","sequence_number":0,"output_index":0,"item":{"id":"","type":"reasoning","encrypted_content":"","summary":[]}}`)
+ 			itemDone, _ = sjson.SetBytes(itemDone, "sequence_number", nextSeq())
+ 			itemDone, _ = sjson.SetBytes(itemDone, "item.id", st.ReasoningItemID)
+ 			itemDone, _ = sjson.SetBytes(itemDone, "output_index", st.ReasoningIndex)
+ 			itemDone, _ = sjson.SetBytes(itemDone, "item.encrypted_content", st.ReasoningSignature)
+-			if full != "" {
++			if !st.ReasoningIsRedacted && full != "" {
+ 				summary := []byte(`{"type":"summary_text","text":""}`)
+ 				summary, _ = sjson.SetBytes(summary, "text", full)
+ 				itemDone, _ = sjson.SetRawBytes(itemDone, "item.summary.-1", summary)
+@@ -397,6 +417,7 @@ func ConvertClaudeResponseToOpenAIResponses(ctx context.Context, modelName strin
+ 			out = append(out, emitEvent("response.output_item.done", itemDone))
+ 			st.ReasoningActive = false
+ 			st.ReasoningPartAdded = false
++			st.ReasoningIsRedacted = false
+ 		}
+ 		return noSSEOutput(out)
+ 	case "message_delta":
