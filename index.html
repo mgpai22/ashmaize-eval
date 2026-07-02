@@ -176,6 +176,7 @@ const state = {
   chartsFailOnly: false,
   scatterX: 'tokens',
   discovery: '',
+  pricing: null,               // { models:{...}, _meta:{...} } from pricing.json
 };
 
 const VIEW = document.getElementById('view');
@@ -223,6 +224,14 @@ function absTime(iso){ if(!iso) return ''; try { return new Date(iso).toLocaleSt
 
 function fmtTok(n){ n=num(n); if(n==null) return '—'; if(n>=1e6) return (n/1e6).toFixed(n>=1e7?0:1)+'M'; if(n>=1e3) return (n/1e3).toFixed(n>=1e4?0:1)+'k'; return ''+n; }
 function fmtSec(s){ s=num(s); if(s==null) return '—'; if(s>=60){ const m=Math.floor(s/60), r=Math.round(s%60); return m+'m'+(r?String(r).padStart(2,'0')+'s':''); } return Math.round(s)+'s'; }
+function fmtUSD(v){
+  v=num(v); if(v==null) return '—';
+  if(v>=100)  return '$'+v.toFixed(0);
+  if(v>=1)    return '$'+v.toFixed(2);
+  if(v>=0.01) return '$'+v.toFixed(3);
+  if(v>0)     return '$'+v.toFixed(4);
+  return '$0';
+}
 
 /* ============================================================
    Derived data (never hardcode sections / models)
@@ -247,6 +256,28 @@ function passTotalOverall(json){ let p=0,t=0; for(const r of (json.results||[]))
 function passTotalForSection(json, sec){ let p=0,t=0; for(const r of (json.results||[])){ if(r.section===sec){ t++; if(r.pass) p++; } } return {pass:p,total:t}; }
 function hasMetrics(){ return goodCards().some(c=>c.json.metrics && typeof c.json.metrics==='object' && Object.keys(c.json.metrics).length); }
 function caseMap(json){ const m=new Map(); for(const r of (json.results||[])) m.set(r.id, r); return m; }
+
+/* ---- cost model (priced from pricing.json; see its _meta.cost_formula) ---- */
+function priceFor(json){
+  const models = state.pricing && state.pricing.models;
+  if (!models) return null;
+  const h = json.harness || {};
+  // try codex_model, then model_label, then slug
+  for (const k of [h.codex_model, h.model_label, json?.harness?.slug]){
+    if (k!=null && models[k]) return models[k];
+  }
+  return null;
+}
+function costOf(json){
+  const p = priceFor(json); if (!p) return null;
+  const m = json.metrics; if (!m || typeof m!=='object') return null;
+  const inp = num(m.input_tokens), out = num(m.output_tokens);
+  if (inp==null && out==null) return null;
+  const cached = num(m.cached_input_tokens) || 0;
+  const uncached = Math.max(0, (inp||0) - cached);
+  return (uncached*p.input + cached*(p.cached_input!=null?p.cached_input:p.input) + (out||0)*p.output) / 1e6;
+}
+function hasCosts(){ return !!(state.pricing && state.pricing.models) && goodCards().some(c=>costOf(c.json)!=null); }
 
 /* ============================================================
    Loading / discovery
@@ -351,6 +382,7 @@ function applySort(){
       case 'passrate':  { const p=passTotalOverall(c.json); return p.total? p.pass/p.total : -1; }
       case 'tokens':    return num(c.json.metrics?.total_tokens) ?? -1;
       case 'time':      return num(c.json.metrics?.generation_seconds) ?? -1;
+      case 'cost':      { const v=costOf(c.json); return v==null?-1:v; }
       case 'generated': { const t=Date.parse(c.json.generated_at||''); return isNaN(t)?-1:t; }
       default:          return num(c.json.section_scores?.[key]) ?? -1; // section name
     }
@@ -446,6 +478,7 @@ function renderLeaderboard(){
   const secs = sectionNames();
   const w = weightMap();
   const metrics = hasMetrics();
+  const costs = hasCosts();
   const q = state.search.trim().toLowerCase();
   const visible = state.order
     .map(s=>state.cards.get(s))
@@ -457,9 +490,9 @@ function renderLeaderboard(){
 
   let rows = '';
   if (visible.length===0){
-    rows = `<tr><td colspan="${9 + secs.length + (metrics?2:0)}" class="text-center text-sm text-stone-400 py-10">No models match “${esc(state.search)}”.</td></tr>`;
+    rows = `<tr><td colspan="${9 + secs.length + (metrics?2:0) + (costs?1:0)}" class="text-center text-sm text-stone-400 py-10">No models match “${esc(state.search)}”.</td></tr>`;
   } else {
-    visible.forEach((c, i) => { rows += modelRow(c, i, secs, metrics); });
+    visible.forEach((c, i) => { rows += modelRow(c, i, secs, metrics, costs); });
   }
 
   return `
@@ -488,6 +521,7 @@ function renderLeaderboard(){
         ${th('passrate','Pass',{center:true, tip:'overall pass rate'})}
         ${metrics?th('tokens','Tokens',{right:true}):''}
         ${metrics?th('time','Gen time',{right:true}):''}
+        ${costs?th('cost','Cost',{right:true, tip:'estimated API cost for this run (see pricing.json)'}):''}
         <th class="w-10 px-2"></th>
       </tr>
     </thead>
@@ -499,7 +533,7 @@ function renderLeaderboard(){
   `;
 }
 
-function modelRow(c, i, secs, metrics){
+function modelRow(c, i, secs, metrics, costs){
   const j = c.json;
   const h = j.harness || {};
   const sel = state.selected.has(c.slug);
@@ -545,11 +579,12 @@ function modelRow(c, i, secs, metrics){
     </td>
     ${metrics?`<td class="px-3 py-2 text-right tabnum text-xs text-stone-500 dark:text-stone-400">${m&&m.total_tokens!=null?fmtTok(m.total_tokens):'—'}</td>`:''}
     ${metrics?`<td class="px-3 py-2 text-right tabnum text-xs text-stone-500 dark:text-stone-400">${m&&m.generation_seconds!=null?fmtSec(m.generation_seconds):'—'}</td>`:''}
+    ${costs?(()=>{const v=costOf(j);return `<td class="px-3 py-2 text-right tabnum text-xs font-medium text-stone-600 dark:text-stone-300" title="${v!=null?'estimated API cost':'no pricing for this model'}">${fmtUSD(v)}</td>`;})():''}
     <td class="px-2 text-center text-stone-400">
       <svg class="w-3.5 h-3.5 transition-transform ${open?'rotate-90':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 6 6 6-6 6"/></svg>
     </td>
   </tr>
-  ${open ? `<tr class="drill-wrap"><td colspan="${9 + secs.length + (metrics?2:0)}" class="p-0">
+  ${open ? `<tr class="drill-wrap"><td colspan="${9 + secs.length + (metrics?2:0) + (costs?1:0)}" class="p-0">
     ${drillPanel(c, secs, metrics)}
   </td></tr>` : ''}
   `;
@@ -589,21 +624,29 @@ function drillPanel(c, secs, metrics){
         Run metadata ${metrics?`& metrics`:''}
       </summary>
       <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 text-xs">
-        ${metricsBlock(j.metrics)}
+        ${metricsBlock(j)}
         ${metaEntries.filter(([k])=>k!=='slug').map(([k,v])=>`<div class="flex gap-2 py-0.5 border-b border-stone-100 dark:border-stone-800/60"><span class="w-44 shrink-0 text-stone-400">${esc(k)}</span><span class="mono text-stone-600 dark:text-stone-300 break-all">${esc(typeof v==='boolean'?(v?'true':'false'):v)}</span></div>`).join('')}
       </div>
     </details>` : ''}
   </div>`;
 }
 
-function metricsBlock(m){
+function metricsBlock(j){
+  const m = j && j.metrics;
   if (!m || typeof m!=='object') return '';
   const row=(label,val,sub='')=>`<div class="flex gap-2 py-0.5 border-b border-stone-100 dark:border-stone-800/60"><span class="w-44 shrink-0 text-stone-400">${label}</span><span class="mono text-stone-600 dark:text-stone-300">${val}${sub?` <span class="text-stone-400">${sub}</span>`:''}</span></div>`;
   const tokSub = (m.input_tokens!=null && m.output_tokens!=null) ? `(in ${fmtTok(m.input_tokens)} · out ${fmtTok(m.output_tokens)})` : '';
+  const cost = costOf(j); const p = priceFor(j);
+  let costSub = '';
+  if (cost!=null && p){
+    const inp=num(m.input_tokens)||0, cached=num(m.cached_input_tokens)||0, out=num(m.output_tokens)||0, uncached=Math.max(0,inp-cached);
+    costSub = `(in ${fmtUSD(uncached*p.input/1e6)} · cache ${fmtUSD(cached*(p.cached_input!=null?p.cached_input:p.input)/1e6)} · out ${fmtUSD(out*p.output/1e6)})`;
+  }
   return [
     m.total_tokens!=null ? row('total_tokens', fmtTok(m.total_tokens), tokSub) : '',
     m.cached_input_tokens!=null ? row('cached_input_tokens', fmtTok(m.cached_input_tokens)) : '',
     m.reasoning_tokens!=null ? row('reasoning_tokens', fmtTok(m.reasoning_tokens)) : '',
+    cost!=null ? row('est. cost', fmtUSD(cost), costSub) : '',
     m.turns!=null ? row('turns', m.turns) : '',
     m.item_count!=null ? row('item_count', m.item_count) : '',
     m.generation_seconds!=null ? row('generation_seconds', fmtSec(m.generation_seconds)) : '',
@@ -735,9 +778,11 @@ function renderCompare(){
   const passRow = `<div class="${labelCls}">Pass / total</div>` +
     sel.map(c=>{ const p=passTotalOverall(c.json); return `<div class="cmp-cell ${borderColor} text-center tabnum text-xs text-stone-600 dark:text-stone-300">${p.pass}/${p.total}</div>`; }).join('');
 
-  const metricsRows = !metrics ? '' :
-    `<div class="${labelCls}">Tokens</div>` + sel.map(c=>`<div class="cmp-cell ${borderColor} text-right tabnum text-xs text-stone-500 dark:text-stone-400">${c.json.metrics?.total_tokens!=null?fmtTok(c.json.metrics.total_tokens):'—'}</div>`).join('')
-    + `<div class="${labelCls}">Gen time</div>` + sel.map(c=>`<div class="cmp-cell ${borderColor} text-right tabnum text-xs text-stone-500 dark:text-stone-400">${c.json.metrics?.generation_seconds!=null?fmtSec(c.json.metrics.generation_seconds):'—'}</div>`).join('');
+  const costs = hasCosts();
+  const metricsRows = (!metrics && !costs) ? '' :
+    (metrics ? `<div class="${labelCls}">Tokens</div>` + sel.map(c=>`<div class="cmp-cell ${borderColor} text-right tabnum text-xs text-stone-500 dark:text-stone-400">${c.json.metrics?.total_tokens!=null?fmtTok(c.json.metrics.total_tokens):'—'}</div>`).join('') : '')
+    + (metrics ? `<div class="${labelCls}">Gen time</div>` + sel.map(c=>`<div class="cmp-cell ${borderColor} text-right tabnum text-xs text-stone-500 dark:text-stone-400">${c.json.metrics?.generation_seconds!=null?fmtSec(c.json.metrics.generation_seconds):'—'}</div>`).join('') : '')
+    + (costs ? `<div class="${labelCls}">Est. cost</div>` + sel.map(c=>{const v=costOf(c.json);return `<div class="cmp-cell ${borderColor} text-right tabnum text-xs font-medium text-stone-600 dark:text-stone-300">${fmtUSD(v)}</div>`;}).join('') : '');
 
   const caseHeader = `<div class="cmp-cell cmp-h cmp-row-label bg-stone-50 dark:bg-stone-900 ${borderColor} text-[11px] font-semibold uppercase tracking-wide text-stone-500 flex items-center justify-between">
       <span>Per-case results</span>
@@ -1005,8 +1050,18 @@ $('#fileInput').addEventListener('change', (e)=>{ handleFiles(e.target.files); e
 (function init(){
   state.theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
   render();
+  loadPricing();
   discoverAndLoad();
 })();
+
+async function loadPricing(){
+  try{
+    const r = await fetch('pricing.json', {cache:'no-store'});
+    if (!r.ok) return;
+    const j = await r.json();
+    if (j && j.models && typeof j.models==='object'){ state.pricing = j; render(); }
+  }catch(e){ /* no pricing file → cost column simply hidden */ }
+}
 </script>
 </body>
 </html>

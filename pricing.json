@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "currency": "USD",
+    "unit": "per_1m_tokens",
+    "updated": "2026-07-01",
+    "cost_formula": "cost = ((input_tokens - cached_input_tokens) * input + cached_input_tokens * cached_input + output_tokens * output) / 1e6",
+    "notes": [
+      "scorecard metrics.input_tokens INCLUDES metrics.cached_input_tokens; the uncached remainder is billed at the input rate and the cached portion at the cached_input rate.",
+      "metrics.total_tokens = input_tokens + output_tokens, so reasoning_tokens are billed within output_tokens and are NOT added separately.",
+      "keys match scorecard harness.codex_model; model_label and slug are also tried as fallbacks.",
+      "prices are standard/on-demand per-1M-token API rates, not batch/flex/priority tiers."
+    ],
+    "sources": {
+      "gpt-5.5": "https://developers.openai.com/api/docs/pricing (OpenAI, 2026)",
+      "gpt-5.4-mini": "https://developers.openai.com/api/docs/models/gpt-5.4-mini (OpenAI, 2026)",
+      "claude-opus-4-8": "https://platform.claude.com/docs/en/about-claude/pricing (Anthropic, 2026)",
+      "claude-sonnet-5": "https://platform.claude.com/docs/en/about-claude/pricing (Anthropic; intro pricing through 2026-08-31)",
+      "claude-sonnet-4-6": "https://platform.claude.com/docs/en/about-claude/pricing (Anthropic, 2026)",
+      "glm-5.2": "https://docs.z.ai/guides/overview/pricing (Z.AI, 2026)"
+    }
+  },
+  "models": {
+    "gpt-5.5":            { "input": 5.00, "cached_input": 0.50, "output": 30.00 },
+    "gpt-5.4-mini":       { "input": 0.75, "cached_input": 0.075, "output": 4.50 },
+    "claude-opus-4-8":    { "input": 5.00, "cached_input": 0.50, "output": 25.00 },
+    "claude-sonnet-5":    { "input": 2.00, "cached_input": 0.20, "output": 2.50, "note": "intro pricing through 2026-08-31; reverts to 3.00/0.30/3.75 on 2026-09-01" },
+    "claude-sonnet-4-6":  { "input": 3.00, "cached_input": 0.30, "output": 15.00 },
+    "glm-5.2":            { "input": 1.40, "cached_input": 0.26, "output": 4.40 },
+    "glm-5.1":            { "input": 1.40, "cached_input": 0.26, "output": 4.40, "note": "same per-token rates as glm-5.2 per Z.AI pricing" },
+    "glm-4.7":            { "input": 0.60, "cached_input": 0.11, "output": 2.20, "note": "Z.AI official rate; third-party resellers (e.g. DeepInfra) list lower" },
+    "gemini-3.5-flash-low": { "input": 1.50, "cached_input": 0.15, "output": 9.00, "note": "Google Gemini 3.5 Flash rate; run via Antigravity OAuth (thinking tier fixed in model id)" }
+  }
+}
