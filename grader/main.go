@@ -42,6 +42,8 @@ type Result struct {
 	Weight  float64 `json:"weight"`
 	Pass    bool    `json:"pass"`
 	Detail  string  `json:"detail"`
+
+	oracleFailed bool // infrastructure failure: the ORACLE (not the candidate) misbehaved
 }
 
 var sectionWeights = map[string]float64{
@@ -216,6 +218,7 @@ func gradeMatch(s Scenario, oracleBin string, oracleArgs []string, agentBin stri
 	exp := runCmd(oracleBin, oracleArgs, in, timeout)
 	if exp.timedOut || exp.execErr != nil || exp.jsonErr != nil || exp.parsed == nil || exp.exit != 0 {
 		res.Pass = false
+		res.oracleFailed = true
 		res.Detail = "oracle failed: " + oracleDetail(exp)
 		return res
 	}
@@ -308,6 +311,21 @@ func main() {
 		} else {
 			results = append(results, gradeMatch(s, *oracleBin, oracleArgs, *agentBin, agentArgs, *timeout))
 		}
+	}
+
+	// Oracle failures are grading-infrastructure failures, not candidate failures: the corpus is
+	// validated against the oracle before commit, so a failing oracle means a broken environment.
+	// Refuse to emit a scorecard that would silently blame the candidate for it.
+	oracleFailures := 0
+	for _, r := range results {
+		if r.oracleFailed {
+			oracleFailures++
+			fmt.Fprintf(os.Stderr, "warning: %s: %s\n", r.ID, r.Detail)
+		}
+	}
+	if oracleFailures > 0 {
+		fmt.Fprintf(os.Stderr, "error: the ORACLE failed on %d scenario(s); this is a grading-environment failure, not a candidate result — no scorecard written\n", oracleFailures)
+		os.Exit(2)
 	}
 
 	type acc struct{ num, den float64 }

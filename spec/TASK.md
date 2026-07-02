@@ -26,9 +26,9 @@ score is a weighted average:
 
 | Section | Weight | What it checks |
 |---|---|---|
-| `replay` | 60% | Full `hash` outputs (`hash_hex`, `reg_digest_hex`, `rom_digest_hex`) match the reference exactly. |
-| `procedural` | 20% | Isolated correctness: ROM generation (`rom_digest`) and single-op semantics (`unit`). |
-| `adversarial` | 20% | You reject malformed/invalid input (`{"error":…}` + non-zero exit) instead of producing garbage. |
+| `replay` | 65% | Full `hash` outputs (`hash_hex`, `reg_digest_hex`, `rom_digest_hex`) match the reference exactly. |
+| `procedural` | 25% | Isolated correctness: ROM generation (`rom_digest`) and single-op semantics (`unit`). |
+| `adversarial` | 10% | You reject malformed/invalid input (`{"error":…}` + non-zero exit) instead of producing garbage. |
 
 `procedural` and `adversarial` localize *where* you diverge before `replay` will pass. The score is
 won on the divergence hot-spots listed at the end of `ASHMAIZE.md`: byte-exact Argon2 `hprime`, ROM

@@ -14,7 +14,7 @@ There are three request kinds: `hash`, `rom_digest`, `unit`. ROM generation is f
 
 ---
 
-## `hash` — full pipeline (graded in `replay`, 60%)
+## `hash` — full pipeline (graded in `replay`, 65%)
 
 Request:
 ```json
@@ -36,7 +36,7 @@ Response — all three are 128-hex-char (64-byte) Blake2b-512 digests:
 }
 ```
 
-## `rom_digest` — ROM generation only (graded in `procedural`, 20%)
+## `rom_digest` — ROM generation only (graded in `procedural`, 25%)
 
 Request:
 ```json
@@ -47,7 +47,7 @@ Response:
 { "rom_digest_hex": "…" }   // identical to the hash response's rom_digest_hex for the same seed/size
 ```
 
-## `unit` — single instruction semantics (graded in `procedural`, 20%)
+## `unit` — single instruction semantics (graded in `procedural`, 25%)
 
 `a_hex`, `b_hex`, and `special1_hex` are **exactly 16 hex digits** (one `u64`, written most
 significant byte first, i.e. `"0000000000000003"` is the number `3`). `out_hex` is the `u64` result
@@ -95,7 +95,7 @@ explicitly so single ops are testable in isolation.
 
 ---
 
-## Errors / adversarial (graded in `adversarial`, 20%)
+## Errors / adversarial (graded in `adversarial`, 10%)
 
 A correct implementation prints `{"error":"<reason>"}` and exits **non-zero** for any invalid
 input. Crashing with no JSON, hanging, or — worst — producing a normal-looking success response for
@@ -104,7 +104,12 @@ invalid input all fail the `adversarial` section. You must reject at least:
 - malformed JSON; a JSON value that is not an object; missing `op`; unknown `op`.
 - any missing required field; a hex field that is not a string.
 - a hex field that is odd-length, contains non-hex characters, or contains **uppercase** letters.
-- `rom_size` that is not a positive integer, not a multiple of 64, or greater than `10485760`.
+- any integer field (`rom_size`, `nb_loops`, `nb_instrs`, `shift`) that is not a **JSON integer
+  representable as a signed 64-bit value**: floats are invalid even when integral (`65536.0` ≠
+  `65536`), and so are strings, booleans, and magnitudes ≥ 2^63 (e.g. `18446744073709551616`).
+  Reject these **before** doing any size-dependent work — a huge `nb_instrs` must produce a fast
+  `{"error":…}`, not an allocation attempt or a near-infinite loop.
+- `rom_size` that is not positive, not a multiple of 64, or greater than `10485760`.
 - `nb_loops < 2`; `nb_instrs < 256`.
 - `unit` with an unknown `instr` (e.g. `"Sub"`).
 - `unit` `Div`/`Mod` with `b_hex == "0000000000000000"` and **no** `special1_hex`.
@@ -116,4 +121,7 @@ invalid input all fail the `adversarial` section. You must reject at least:
   hard-coded, so the corpus stays valid as the spec is pinned.
 - `rom_digest_hex` for a given `(rom_seed_hex, rom_size)` is identical whether produced by `hash` or
   `rom_digest` — same ROM, same digest.
+- `preimage_hex` and `rom_seed_hex` may be the **empty string** `""` (zero bytes) — that is valid
+  input, not an error. Only the `unit` value fields (`a_hex`, `b_hex`, `special1_hex`) have a fixed
+  length (exactly 16 hex digits).
 - Determinism is mandatory: identical inputs must yield byte-identical outputs across runs/machines.

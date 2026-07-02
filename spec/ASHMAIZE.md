@@ -116,18 +116,28 @@ Given `key` (the `rom_seed` bytes) and `rom_size`:
 
 The ROM is the byte string of all the chunks concatenated, length `rom_size`.
 
-### 3.1 ROM access — `rom.at(i)`
+### 3.1 ROM access — `rom.at(addr)`
 
-Memory reads index the ROM in 64-byte lines, but **the index is a byte offset, not a line number**:
+Memory reads index the ROM in 64-byte lines, but **the index is a byte offset, not a line number**,
+and the 64-bit address is **truncated to `u32` before the modulo**:
 
 ```
-rom.at(i):
-    start = (i as u64) mod (rom_size / 64)      # a byte offset in 0 .. rom_size/64
+rom.at(addr):                                   # addr: the operand's u64 literal (§7)
+    i     = addr mod 2^32                       # truncate to u32 FIRST (take the low 32 bits)
+    start = i mod (rom_size / 64)               # a BYTE offset in 0 .. rom_size/64
     return ROM[start .. start + 64]             # 64 bytes
 ```
 
-So consecutive `start` values overlap heavily (they differ by 1 byte, not 64). Do **not** multiply
-by 64. This is a deliberate, easy-to-miss quirk.
+Two deliberate, easy-to-miss quirks — match both exactly:
+
+1. `start` is a **byte offset**, not a chunk index: consecutive `start` values overlap heavily
+   (they differ by 1 byte, not 64). Do **not** multiply by 64.
+2. The address is reduced **`u32`-first**: `(addr mod 2^32) mod (rom_size/64)`, *not*
+   `addr mod (rom_size/64)`. When `rom_size/64` is a power of two the two orders happen to agree
+   (`2^32` is a multiple of `rom_size/64`, so the truncation is invisible), but for any other size
+   they diverge for almost every address — e.g. `addr = 2^32` gives `start = 0` here, while a
+   direct 64-bit modulo by `65` would give `4`. Doing the modulo on the full 64-bit literal is the
+   single most common way otherwise-correct implementations fail non-power-of-two `rom_size`.
 
 ## 4. VM state and initialization
 
@@ -230,7 +240,7 @@ When an operand's source is **Memory**, read the ROM at the operand's literal as
 
 ```
 addr = lit1 (operand 1) or lit2 (operand 2)        # the 64-bit literal, used as the address
-line = rom.at(addr)                                 # 64 bytes (§3.1)
+line = rom.at(addr)                                 # 64 bytes; u32-truncates addr first (§3.1)
 MEM_DIGEST.update(line)                              # absorb the full 64-byte line
 memory_counter += 1                                  # wrapping u32
 idx = (memory_counter mod 8) * 8                     # AFTER the increment
@@ -239,7 +249,8 @@ value = LE_u64( line[idx .. idx + 8] )               # the operand value
 
 So: the **whole 64-byte line** feeds the memory digest, but the **operand value** is only the
 8-byte sub-chunk selected by the post-increment `memory_counter mod 8`. The counter is bumped
-**before** computing `idx`, and it persists across instructions and loops.
+**before** computing `idx`, and it persists across instructions and loops. The address reduction
+(`u32`-truncate, then modulo — §3.1) happens inside `rom.at`.
 
 ## 8. Special values
 
@@ -323,7 +334,9 @@ the reference does for fixed inputs.
       **length-parameterized** Blake2b tail block (§0.2). Wrong tail = everything downstream wrong.
 - [ ] Blake2b-256 vs Blake2b-512 vs Blake2bN are distinct (output length is in the parameter block).
 - [ ] ROM seed is `B256(LE32(rom_size) || key)`; ROM digest is `B512` over generated chunks in order.
-- [ ] `rom.at` uses a **byte offset** `i mod (rom_size/64)`, not `(i mod n) * 64`.
+- [ ] `rom.at` reduces the address **`u32`-first**: `(addr mod 2^32) mod (rom_size/64)`, used as a
+      **byte offset** — not `addr mod (rom_size/64)`, and not `(… ) * 64`. Test a non-power-of-two
+      `rom_size` (e.g. 4160): power-of-two sizes mask a wrong reduction order.
 - [ ] VM init buffer is `448` bytes split `256 | 64 | 64 | 64`; digests are **seeded** then kept live.
 - [ ] Instruction decode: big-endian `rs` u16, 5-bit `r1/r2/r3`; `lit1/lit2` little-endian u64.
 - [ ] `MulH` = **high** 64 bits, unsigned. `Mod` returns the **quotient** `src1/src2`.

@@ -70,8 +70,11 @@ def require_int(req, field):
     if field not in req:
         fail(f"missing field: {field}")
     v = req[field]
-    # bool is a subclass of int; reject it. Floats are not integers.
+    # bool is a subclass of int; reject it. Floats are not integers. Match the oracle's
+    # signed-64-bit parse: anything outside i64 range is not a valid integer field.
     if isinstance(v, bool) or not isinstance(v, int):
+        fail(f"field {field} must be an integer")
+    if not (-(1 << 63) <= v < (1 << 63)):
         fail(f"field {field} must be an integer")
     return v
 
